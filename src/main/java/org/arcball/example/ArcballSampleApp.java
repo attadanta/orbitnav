@@ -1,6 +1,7 @@
 package org.arcball.example;
 
 import org.arcball.ArcballCameraRig;
+import org.arcball.TurntableCameraRig;
 
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -28,7 +29,9 @@ public final class ArcballSampleApp extends Application {
         Group geometryGroup = buildGeometry();
         world.getChildren().add(geometryGroup);
         
-        ArcballCameraRig cameraRig = new ArcballCameraRig();
+        //ArcballCameraRig cameraRig = new ArcballCameraRig();
+        //cameraRig.setCameraForScene(scene);
+        TurntableCameraRig cameraRig = new TurntableCameraRig();
         cameraRig.setCameraForScene(scene);
         
         primaryStage.setTitle("Arcball Sample Application");
