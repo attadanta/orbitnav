@@ -32,14 +32,17 @@ public final class MouseTurntableInteraction {
     
     //--------------------------------------------------------------------------------------------- PRIVATE / PROTECTED
     
-    private static MouseButton DEFAULT_MOUSE_BUTTON = MouseButton.PRIMARY;
+    private static double      DEFAULT_SCALE_COEFFICIENT = 0.0075;
+    private static MouseButton DEFAULT_MOUSE_BUTTON      = MouseButton.PRIMARY;
     
-    private MouseButton mouseButton = DEFAULT_MOUSE_BUTTON;
+    private double      scaleCoefficient = DEFAULT_SCALE_COEFFICIENT;
+    private MouseButton mouseButton      = DEFAULT_MOUSE_BUTTON;
     
     private final EventHandler<MouseEvent> mousePressHandler = new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent mouseEvent) {
             if (mouseEvent.getButton() == mouseButton) {
-                
+                mousePosX = mouseEvent.getSceneX();
+                mousePosY = mouseEvent.getSceneY();
             }
         }
     };
@@ -47,12 +50,25 @@ public final class MouseTurntableInteraction {
     private final EventHandler<MouseEvent> mouseDragHandler = new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent mouseEvent) {
             if (mouseEvent.getButton() == mouseButton) {
-                
+                // calculate mouse position delta
+                oldMousePosX = mousePosX;
+                oldMousePosY = mousePosY;
+                mousePosX    = mouseEvent.getSceneX();
+                mousePosY    = mouseEvent.getSceneY();
+                mouseDeltaX  = mousePosX - oldMousePosX;
+                mouseDeltaY  = mousePosY - oldMousePosY;
+                // update camera rotation
             }
         }
     };
     
     private Scene  scene        = null;
     private Rotate cameraRotate = null;
+    private double mousePosX;
+    private double mousePosY;
+    private double oldMousePosX;
+    private double oldMousePosY;
+    private double mouseDeltaX;
+    private double mouseDeltaY;
     
 }

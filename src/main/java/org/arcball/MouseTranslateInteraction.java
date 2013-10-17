@@ -52,12 +52,14 @@ public final class MouseTranslateInteraction {
     private final EventHandler<MouseEvent> mouseDragHandler = new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent mouseEvent) {
             if (mouseEvent.getButton() == mouseButton) {
+                // calculate mouse position delta
                 oldMousePosX = mousePosX;
                 oldMousePosY = mousePosY;
                 mousePosX    = mouseEvent.getSceneX();
                 mousePosY    = mouseEvent.getSceneY();
                 mouseDeltaX  = mousePosX - oldMousePosX;
                 mouseDeltaY  = mousePosY - oldMousePosY;
+                // update camera translation
                 cameraTranslate.setX(cameraTranslate.getX() - (mouseDeltaX * scaleCoefficient));
                 cameraTranslate.setY(cameraTranslate.getY() - (mouseDeltaY * scaleCoefficient));
             }

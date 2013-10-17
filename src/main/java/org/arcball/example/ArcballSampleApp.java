@@ -56,7 +56,7 @@ public final class ArcballSampleApp extends Application {
         
         PhongMaterial greenMaterial = new PhongMaterial();
         greenMaterial.setDiffuseColor(Color.DARKGREEN);
-        greenMaterial.setSpecularColor(Color.GREEN);
+        greenMaterial.setSpecularColor(Color.BLACK);
         
         Box cube = new Box(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
         cube.setMaterial(greenMaterial);

@@ -1,6 +1,7 @@
 package org.arcball;
 
 import javafx.event.EventHandler;
+import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
@@ -40,7 +41,7 @@ public final class TurntableCameraRig extends Group {
     private static MouseButton PAN_BUTTON       = MouseButton.SECONDARY;
     private static double      TURNTABLE_COEFF  = 0.4;
     private static double      ZOOM_COEFF       = 0.001;
-    private static double      PAN_COEFF        = 0.001;
+    private static double      PAN_COEFF        = 0.0007;
     
     private       Scene             scene     = null;
     private final PerspectiveCamera camera    = new PerspectiveCamera(true);
@@ -158,14 +159,19 @@ public final class TurntableCameraRig extends Group {
                     y = me.getSceneY();
                     deltaX = x - oldX;
                     deltaY = y - oldY;
-                    // update camera position
+                    // z distance of camera
                     zDistance = zOffset.getZ();
-                    panTran.setX(panTran.getX() + (PAN_COEFF * deltaX * zDistance));
-                    panTran.setY(panTran.getY() + (PAN_COEFF * deltaY * zDistance));
-                    // TODO:
-                    // 1. Figure out screen x and y directions from rotateZ and rotateX
-                    //      (quat(rotateZ) * quat(rotateX)).toMatrix.inverse -> transform (1,0,0) and (0,-1,0)
-                    // (Avoid creating any garbage!)
+                    // find local x and y vectors for the camera
+                    Point3D camX = rotateZ.transform(rotateX.transform(xvec));
+                    Point3D camY = rotateZ.transform(rotateX.transform(yvec));
+                    // x shift
+                    panTran.setX(panTran.getX() + (PAN_COEFF * deltaX * zDistance * camX.getX()));
+                    panTran.setY(panTran.getY() + (PAN_COEFF * deltaX * zDistance * camX.getY()));
+                    panTran.setZ(panTran.getZ() + (PAN_COEFF * deltaX * zDistance * camX.getZ()));
+                    // y shift
+                    panTran.setX(panTran.getX() + (PAN_COEFF * deltaY * zDistance * camY.getX()));
+                    panTran.setY(panTran.getY() + (PAN_COEFF * deltaY * zDistance * camY.getY()));
+                    panTran.setZ(panTran.getZ() + (PAN_COEFF * deltaY * zDistance * camY.getZ()));                    
                 }
             }
         };
@@ -173,6 +179,8 @@ public final class TurntableCameraRig extends Group {
         private final Rotate rotateZ;
         private final Rotate rotateX;
         private final Translate zOffset;
+        private final Point3D xvec = new Point3D(1, 0, 0);
+        private final Point3D yvec = new Point3D(0, 1, 0);
         private double x;
         private double y;
         private double oldX;
