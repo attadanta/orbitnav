@@ -1,20 +1,19 @@
 package org.arcball.example;
 
 import java.io.File;
-import java.util.List;
 
 import org.arcball.Pane3D;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
 import javafx.stage.Stage;
 
 public final class ArcballSampleApp extends Application {
@@ -28,12 +27,15 @@ public final class ArcballSampleApp extends Application {
         
         MenuBar menuBar = new MenuBar();
         Menu menuFile = new Menu("File");
-        menuBar.getMenus().add(menuFile);
+        Menu menuView = new Menu("View");
+        MenuItem viewAll = new MenuItem("View all");
+        viewAll.setOnAction(viewAllHandler);
+        menuView.getItems().add(viewAll);
+        menuBar.getMenus().addAll(menuFile, menuView);
         baseVBox.getChildren().add(menuBar);
         
         Scene scene = new Scene(baseVBox, DEFAULT_WIDTH, DEFAULT_HEIGHT, true);
 
-        Pane3D pane3D = new Pane3D();
         VBox.setVgrow(pane3D, Priority.ALWAYS);
         baseVBox.getChildren().add(pane3D);
                 
@@ -42,7 +44,7 @@ public final class ArcballSampleApp extends Application {
         
         Group geometryGroup = buildGeometry();
         world.getChildren().add(geometryGroup);
-        pane3D.getCameraRig().encompassBounds(geometryGroup.getBoundsInParent());
+        pane3D.getCameraRig().encompassBounds(geometryGroup.getBoundsInParent(), 0);
         
         primaryStage.setTitle("Arcball Sample Application");
         primaryStage.setScene(scene);
@@ -61,6 +63,12 @@ public final class ArcballSampleApp extends Application {
     
     //--------------------------------------------------------------------------------------------- PRIVATE / PROTECTED
     
+    private EventHandler<ActionEvent> viewAllHandler = new EventHandler<ActionEvent>() {
+        @Override public void handle(ActionEvent e) {
+            pane3D.viewAll(500);
+        }
+    };
+    
     private static Group buildGeometry() {
         Group geometryGroup = new Group();
         
@@ -72,6 +80,8 @@ public final class ArcballSampleApp extends Application {
         return geometryGroup;
     }
 
+    private final Pane3D pane3D = new Pane3D();
+    
     private static final int DEFAULT_WIDTH  = 1024;
     private static final int DEFAULT_HEIGHT = 768;
     private static final double CUBE_SIZE = 1;

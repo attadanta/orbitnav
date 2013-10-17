@@ -9,5 +9,5 @@ public interface CameraRig {
     void detachFromScene(Scene scene);
     void attachToSubScene(SubScene subscene);
     void detachFromSubScene(SubScene subscene);
-    public void encompassBounds(Bounds bounds);
+    public void encompassBounds(Bounds bounds, double animationDurationMillis);
 }

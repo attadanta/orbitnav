@@ -4,6 +4,9 @@ import org.arcball.internal.InteractionXZTurntable;
 import org.arcball.internal.InteractionScrollZoom;
 import org.arcball.internal.InteractionPan;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -18,6 +21,7 @@ import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
+import javafx.util.Duration;
 
 public final class TurntableCameraRig extends Group implements CameraRig {
 
@@ -59,7 +63,7 @@ public final class TurntableCameraRig extends Group implements CameraRig {
         this.subscene = null;
     }
     
-    public void encompassBounds(Bounds bounds) {
+    public void encompassBounds(Bounds bounds, double animationDurationMillis) {
         // find the center of the bounds
         double cx = (bounds.getMinX() + bounds.getMaxX()) / 2.0;
         double cy = (bounds.getMinY() + bounds.getMaxY()) / 2.0;
@@ -71,11 +75,21 @@ public final class TurntableCameraRig extends Group implements CameraRig {
           PerspectiveCamera pCamera = (PerspectiveCamera)getCamera();
           double fov = pCamera.getFieldOfView() * Math.PI / 180.0;
           double d = r / Math.tan(fov / 2.0);
-          setDistanceFromOrigin(1.1 * d);
-          setOriginX(cx);
-          setOriginY(cy);
-          setOriginZ(cz);
-          pCamera.setNearClip(0.1 * d);
+          if (animationDurationMillis <= 0.0) {
+              setDistanceFromOrigin(1.1 * d);
+              setOriginX(cx);
+              setOriginY(cy);
+              setOriginZ(cz);
+          } else {
+              Duration tf = Duration.millis(animationDurationMillis);
+              Timeline timeline = new Timeline();
+              timeline.getKeyFrames().add(new KeyFrame(tf, new KeyValue(distanceFromOriginProperty(), 1.1 * d)));
+              timeline.getKeyFrames().add(new KeyFrame(tf, new KeyValue(originXProperty(), cx)));
+              timeline.getKeyFrames().add(new KeyFrame(tf, new KeyValue(originYProperty(), cy)));
+              timeline.getKeyFrames().add(new KeyFrame(tf, new KeyValue(originZProperty(), cz)));
+              timeline.play();
+          }
+          pCamera.setNearClip(0.05 * d);
           pCamera.setFarClip(10.0 * d);
         }
     }

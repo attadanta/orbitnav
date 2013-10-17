@@ -23,6 +23,10 @@ public final class Pane3D extends Pane {
         init();
     }
     
+    public void viewAll(double animationDurationMillis) {
+        getCameraRig().encompassBounds(getRoot().getBoundsInParent(), animationDurationMillis);
+    }
+    
     public ObjectProperty<Group> rootProperty() { return root; }
     public void setRoot(Group root) { this.root.set(root); }
     public Group getRoot() { return root.get(); }
@@ -38,7 +42,7 @@ public final class Pane3D extends Pane {
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
     private final ObjectProperty<Group> root = new SimpleObjectProperty<Group>(this, "root", new Group());
-    private final ObjectProperty<Paint> fill = new SimpleObjectProperty<Paint>(this, "fill", Color.DARKGRAY);
+    private final ObjectProperty<Paint> fill = new SimpleObjectProperty<Paint>(this, "fill", Color.DARKGREY);
     private final ObjectProperty<CameraRig> cameraRig = new SimpleObjectProperty<CameraRig>(this, "cameraRig", null);
     
     private final SubScene subScene = new SubScene(getRoot(), 8, 8, true, true);
