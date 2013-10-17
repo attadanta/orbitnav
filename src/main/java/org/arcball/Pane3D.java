@@ -41,7 +41,7 @@ public final class Pane3D extends Pane {
     private final ObjectProperty<Paint> fill = new SimpleObjectProperty<Paint>(this, "fill", Color.DARKGRAY);
     private final ObjectProperty<CameraRig> cameraRig = new SimpleObjectProperty<CameraRig>(this, "cameraRig", null);
     
-    private final SubScene subScene = new SubScene(getRoot(), 8, 8);
+    private final SubScene subScene = new SubScene(getRoot(), 8, 8, true, true);
     
     private void init() {
         subScene.fillProperty().bind(fill);

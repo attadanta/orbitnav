@@ -1,5 +1,8 @@
 package org.arcball.example;
 
+import java.io.File;
+import java.util.List;
+
 import org.arcball.Pane3D;
 
 import javafx.application.Application;
@@ -39,6 +42,7 @@ public final class ArcballSampleApp extends Application {
         
         Group geometryGroup = buildGeometry();
         world.getChildren().add(geometryGroup);
+        pane3D.getCameraRig().encompassBounds(geometryGroup.getBoundsInParent());
         
         primaryStage.setTitle("Arcball Sample Application");
         primaryStage.setScene(scene);
@@ -60,13 +64,10 @@ public final class ArcballSampleApp extends Application {
     private static Group buildGeometry() {
         Group geometryGroup = new Group();
         
-        PhongMaterial greenMaterial = new PhongMaterial();
-        greenMaterial.setDiffuseColor(Color.DARKGREEN);
-        greenMaterial.setSpecularColor(Color.BLACK);
-        
-        Box cube = new Box(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
-        cube.setMaterial(greenMaterial);
-        geometryGroup.getChildren().add(cube);
+        Group atomGroup = new Group();
+        PDBSource pdbSource = new PDBSource(new File("1BNA.pdb"));
+        atomGroup.getChildren().addAll(pdbSource.getAtoms(0.5));
+        geometryGroup.getChildren().add(atomGroup);
         
         return geometryGroup;
     }

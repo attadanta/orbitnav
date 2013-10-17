@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Bounds;
 import javafx.scene.Camera;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
@@ -56,6 +57,27 @@ public final class TurntableCameraRig extends Group implements CameraRig {
         pan.detachFromSubScene(subscene);
         subscene.setCamera(null);
         this.subscene = null;
+    }
+    
+    public void encompassBounds(Bounds bounds) {
+        // find the center of the bounds
+        double cx = (bounds.getMinX() + bounds.getMaxX()) / 2.0;
+        double cy = (bounds.getMinY() + bounds.getMaxY()) / 2.0;
+        double cz = (bounds.getMinZ() + bounds.getMaxZ()) / 2.0;
+        // find the "radius", as the maximum of the depth, height and width divided by 2
+        double r = Math.max(bounds.getDepth(), Math.max(bounds.getHeight(), bounds.getWidth())) / 2.0;
+        // configure camera
+        if (getCamera() instanceof PerspectiveCamera) {
+          PerspectiveCamera pCamera = (PerspectiveCamera)getCamera();
+          double fov = pCamera.getFieldOfView() * Math.PI / 180.0;
+          double d = r / Math.tan(fov / 2.0);
+          setDistanceFromOrigin(1.1 * d);
+          setOriginX(cx);
+          setOriginY(cy);
+          setOriginZ(cz);
+          pCamera.setNearClip(0.1 * d);
+          pCamera.setFarClip(10.0 * d);
+        }
     }
     
     public ObjectProperty<Camera> cameraProperty() { return camera; }
