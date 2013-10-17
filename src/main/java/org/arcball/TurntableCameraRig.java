@@ -18,7 +18,7 @@ import javafx.scene.SubScene;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 
-public final class TurntableCameraRig extends Group {
+public final class TurntableCameraRig extends Group implements CameraRig {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
     
@@ -109,10 +109,10 @@ public final class TurntableCameraRig extends Group {
         // camera change listener
         camera.addListener(cameraChangeListener);
         // pan translation
-        Translate panTran = new Translate();
-        panTran.xProperty().bind(originX);
-        panTran.yProperty().bind(originY);
-        panTran.zProperty().bind(originZ);
+        Translate panTranslation = new Translate();
+        panTranslation.xProperty().bind(originX);
+        panTranslation.yProperty().bind(originY);
+        panTranslation.zProperty().bind(originZ);
         // z rotation
         Rotate rotateZ = new Rotate(0, Rotate.Z_AXIS);
         rotateZ.angleProperty().bind(zRotation);
@@ -123,7 +123,7 @@ public final class TurntableCameraRig extends Group {
         Translate zOffset = new Translate();
         zOffset.zProperty().bind(distanceFromOrigin.negate());
         // set up transforms
-        this.getTransforms().addAll(panTran, rotateZ, rotateX, zOffset);
+        this.getTransforms().addAll(panTranslation, rotateZ, rotateX, zOffset);
         this.getChildren().add(getCamera());
     }
     

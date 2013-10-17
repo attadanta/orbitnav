@@ -1,10 +1,14 @@
 package org.arcball.example;
 
-import org.arcball.TurntableCameraRig;
+import org.arcball.Pane3D;
 
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
@@ -16,17 +20,25 @@ public final class ArcballSampleApp extends Application {
     
     @Override
     public void start(Stage primaryStage) {
-        Scene scene = new Scene(root, DEFAULT_WIDTH, DEFAULT_HEIGHT, true);
-        scene.setFill(Color.GREY);
         
+        VBox baseVBox = new VBox();
+        
+        MenuBar menuBar = new MenuBar();
+        Menu menuFile = new Menu("File");
+        menuBar.getMenus().add(menuFile);
+        baseVBox.getChildren().add(menuBar);
+        
+        Scene scene = new Scene(baseVBox, DEFAULT_WIDTH, DEFAULT_HEIGHT, true);
+
+        Pane3D pane3D = new Pane3D();
+        VBox.setVgrow(pane3D, Priority.ALWAYS);
+        baseVBox.getChildren().add(pane3D);
+                
         Group world = new Group();
-        root.getChildren().add(world);
+        pane3D.getRoot().getChildren().add(world);
         
         Group geometryGroup = buildGeometry();
         world.getChildren().add(geometryGroup);
-        
-        TurntableCameraRig cameraRig = new TurntableCameraRig();
-        cameraRig.attachToScene(scene);
         
         primaryStage.setTitle("Arcball Sample Application");
         primaryStage.setScene(scene);
@@ -58,8 +70,6 @@ public final class ArcballSampleApp extends Application {
         
         return geometryGroup;
     }
-    
-    private final Group root = new Group();
 
     private static final int DEFAULT_WIDTH  = 1024;
     private static final int DEFAULT_HEIGHT = 768;
