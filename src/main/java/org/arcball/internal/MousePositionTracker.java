@@ -1,4 +1,4 @@
-package org.arcball;
+package org.arcball.internal;
 
 /**
  * Tracker for mouse position between press and drag events.
@@ -12,7 +12,7 @@ package org.arcball;
  * 
  * @author Jonathan Merritt <j.s.merritt@gmail.com>
  */
-final class MousePositionTracker {
+public final class MousePositionTracker {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
     

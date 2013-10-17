@@ -1,5 +1,7 @@
 package org.arcball;
 
+import org.arcball.internal.MousePositionTracker;
+
 import javafx.event.EventHandler;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
