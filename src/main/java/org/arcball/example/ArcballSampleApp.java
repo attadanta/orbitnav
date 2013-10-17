@@ -1,6 +1,5 @@
 package org.arcball.example;
 
-import org.arcball.ArcballCameraRig;
 import org.arcball.TurntableCameraRig;
 
 import javafx.application.Application;
