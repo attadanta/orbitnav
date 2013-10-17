@@ -1,17 +1,17 @@
 package org.arcball.internal;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.transform.Translate;
 
 public final class InteractionScrollZoom {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
     
-    public InteractionScrollZoom(Translate zOffset) {
-        this.zOffset = zOffset;
+    public InteractionScrollZoom(DoubleProperty distanceFromOrigin) {
+        this.distanceFromOrigin = distanceFromOrigin;
     }
     
     public void attachToScene(Scene scene) { scene.addEventHandler(ScrollEvent.SCROLL, scrollHandler); }
@@ -25,12 +25,12 @@ public final class InteractionScrollZoom {
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
-    private final Translate zOffset;
+    private final DoubleProperty distanceFromOrigin;
     private double coeff = 0.002;
 
     private final EventHandler<ScrollEvent> scrollHandler = new EventHandler<ScrollEvent>() {
         @Override public void handle(ScrollEvent se) {
-            zOffset.setZ((1.0 - (coeff * se.getDeltaY())) * zOffset.getZ());
+            distanceFromOrigin.set((1.0 - (coeff * se.getDeltaY())) * distanceFromOrigin.get());
         }
     };
     

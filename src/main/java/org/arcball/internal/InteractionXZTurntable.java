@@ -1,17 +1,17 @@
 package org.arcball.internal;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.input.MouseButton;
-import javafx.scene.transform.Rotate;
 
 public final class InteractionXZTurntable {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
     
-    public InteractionXZTurntable(Rotate rotateX, Rotate rotateZ) {
-        this.rotateX = rotateX;
-        this.rotateZ = rotateZ;
+    public InteractionXZTurntable(DoubleProperty xRotation, DoubleProperty zRotation) {
+        this.xRotation = xRotation;
+        this.zRotation = zRotation;
     }
     
     public void attachToScene(Scene scene) { dragHelper.attachToScene(scene); }
@@ -24,15 +24,15 @@ public final class InteractionXZTurntable {
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
-    private final Rotate rotateX;
-    private final Rotate rotateZ;
+    private final DoubleProperty xRotation;
+    private final DoubleProperty zRotation;
     private MouseButton triggerButton = MouseButton.PRIMARY;
     private double coeff = 0.4;
     
     private final DragHandler dragHandler = new DragHandler() {
         public void handleDrag(double deltaX, double deltaY) {
-            rotateX.setAngle(rotateX.getAngle() - (coeff * deltaY));
-            rotateZ.setAngle(rotateZ.getAngle() + (coeff * deltaX));                    
+            xRotation.set(xRotation.get() - (coeff * deltaY));
+            zRotation.set(zRotation.get() + (coeff * deltaX));
         }
     };
     
