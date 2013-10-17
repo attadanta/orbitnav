@@ -23,21 +23,6 @@ public final class TurntableCameraRig extends Group {
     //---------------------------------------------------------------------------------------------------------- PUBLIC
     
     public TurntableCameraRig() {
-        // set up camera
-        camera = new SimpleObjectProperty<Camera>(this, "camera", new PerspectiveCamera(true));
-        camera.addListener(cameraChangeListener);
-        // set up origin
-        panTran.xProperty().bindBidirectional(originX);
-        panTran.yProperty().bindBidirectional(originY);
-        panTran.zProperty().bindBidirectional(originZ);
-        // set up x rotation
-        rotateX.angleProperty().bindBidirectional(xRotation);
-        // set up z rotation
-        rotateZ.angleProperty().bindBidirectional(zRotation);
-        // set up distance from origin
-        distanceFromOrigin.addListener(distanceFromOriginChangeListener);
-        distanceFromOrigin.set(10);
-        
         buildTree();
     }
     
@@ -106,18 +91,14 @@ public final class TurntableCameraRig extends Group {
     private Scene scene = null;
     private SubScene subscene = null;
     
-    private final ObjectProperty<Camera> camera;
+    private final ObjectProperty<Camera> camera     = new SimpleObjectProperty<Camera>(this, "camera", 
+                                                                                       new PerspectiveCamera(true));
     private final DoubleProperty originX            = new SimpleDoubleProperty(this, "originX", 0);
     private final DoubleProperty originY            = new SimpleDoubleProperty(this, "originY", 0);
     private final DoubleProperty originZ            = new SimpleDoubleProperty(this, "originZ", 0);
     private final DoubleProperty zRotation          = new SimpleDoubleProperty(this, "zRotation", 0);
     private final DoubleProperty xRotation          = new SimpleDoubleProperty(this, "xRotation", 0);
-    private final DoubleProperty distanceFromOrigin = new SimpleDoubleProperty(this, "distanceFromOrigin", 0);
-    
-    private final Translate         panTran   = new Translate();
-    private final Rotate            rotateZ   = new Rotate(0, Rotate.Z_AXIS);
-    private final Rotate            rotateX   = new Rotate(0, Rotate.X_AXIS);
-    private final Translate         zOffset   = new Translate();
+    private final DoubleProperty distanceFromOrigin = new SimpleDoubleProperty(this, "distanceFromOrigin", 10);
     
     private final InteractionXZTurntable turntable = new InteractionXZTurntable(xRotation, zRotation);
     private final InteractionScrollZoom  zoom      = new InteractionScrollZoom(distanceFromOrigin);
@@ -125,17 +106,26 @@ public final class TurntableCameraRig extends Group {
                                                                         xRotation, distanceFromOrigin);
     
     private void buildTree() {
+        // camera change listener
+        camera.addListener(cameraChangeListener);
+        // pan translation
+        Translate panTran = new Translate();
+        panTran.xProperty().bind(originX);
+        panTran.yProperty().bind(originY);
+        panTran.zProperty().bind(originZ);
+        // z rotation
+        Rotate rotateZ = new Rotate(0, Rotate.Z_AXIS);
+        rotateZ.angleProperty().bind(zRotation);
+        // x rotation
+        Rotate rotateX = new Rotate(0, Rotate.X_AXIS);
+        rotateX.angleProperty().bind(xRotation);
+        // z Offset translation
+        Translate zOffset = new Translate();
+        zOffset.zProperty().bind(distanceFromOrigin.negate());
+        // set up transforms
         this.getTransforms().addAll(panTran, rotateZ, rotateX, zOffset);
         this.getChildren().add(getCamera());
     }
-    
-    private final ChangeListener<Number> distanceFromOriginChangeListener = new ChangeListener<Number>() {
-        @Override public void changed(
-                ObservableValue<? extends Number> observable, Number oldDistance, Number newDistance 
-        ) {
-            zOffset.setZ(-Math.abs(newDistance.doubleValue()));
-        }
-    };
     
     private final ChangeListener<Camera> cameraChangeListener = new ChangeListener<Camera>() {
         @Override public void changed(
