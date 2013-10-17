@@ -4,13 +4,10 @@ import org.arcball.TurntableCameraRig;
 
 import javafx.application.Application;
 import javafx.scene.Group;
-import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
-import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 
 public final class ArcballSampleApp extends Application {
@@ -28,10 +25,8 @@ public final class ArcballSampleApp extends Application {
         Group geometryGroup = buildGeometry();
         world.getChildren().add(geometryGroup);
         
-        //ArcballCameraRig cameraRig = new ArcballCameraRig();
-        //cameraRig.setCameraForScene(scene);
         TurntableCameraRig cameraRig = new TurntableCameraRig();
-        cameraRig.setCameraForScene(scene);
+        cameraRig.attachToScene(scene);
         
         primaryStage.setTitle("Arcball Sample Application");
         primaryStage.setScene(scene);

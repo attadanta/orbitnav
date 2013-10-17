@@ -7,6 +7,7 @@ import org.arcball.internal.InteractionPan;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
+import javafx.scene.SubScene;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 
@@ -18,25 +19,36 @@ public final class TurntableCameraRig extends Group {
         buildTree();
     }
     
-    public void setCameraForScene(Scene scene) {
-        this.scene = scene;
+    public void attachToScene(Scene scene) {
         scene.setCamera(camera);
         turntable.attachToScene(scene);
         zoom.attachToScene(scene);
         pan.attachToScene(scene);
     }
     
-    public void removeCameraFromScene(Scene scene) {
+    public void detachFromScene(Scene scene) {
         turntable.detachFromScene(scene);
         zoom.detachFromScene(scene);
         pan.detachFromScene(scene);
-        this.scene = null;
         scene.setCamera(null);
+    }
+    
+    public void attachToSubScene(SubScene subscene) {
+        turntable.attachToSubScene(subscene);
+        zoom.attachToSubScene(subscene);
+        pan.attachToSubScene(subscene);
+        subscene.setCamera(camera);
+    }
+    
+    public void detachFromSubScene(SubScene subscene) {
+        turntable.detachFromSubScene(subscene);
+        zoom.detachFromSubScene(subscene);
+        pan.detachFromSubScene(subscene);
+        subscene.setCamera(null);
     }
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
-    private       Scene             scene     = null;
     private final PerspectiveCamera camera    = new PerspectiveCamera(true);
     private final Translate         panTran   = new Translate(0, 0, 0);
     private final Rotate            rotateZ   = new Rotate(0, Rotate.Z_AXIS);
