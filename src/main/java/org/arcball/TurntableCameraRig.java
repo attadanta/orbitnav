@@ -75,35 +75,23 @@ public final class TurntableCameraRig extends Group {
         private final EventHandler<MouseEvent> pressHandler = new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent me) {
                 if (me.getButton() == TURNTABLE_BUTTON) {
-                    x = me.getSceneX();
-                    y = me.getSceneY();
+                    mpt.mousePress(me.getSceneX(), me.getSceneY());
                 }
             }
         };
         private final EventHandler<MouseEvent> dragHandler = new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent me) {
                 if (me.getButton() == TURNTABLE_BUTTON) {
-                    // update mouse position delta
-                    oldX = x;
-                    oldY = y;
-                    x = me.getSceneX();
-                    y = me.getSceneY();
-                    deltaX = x - oldX;
-                    deltaY = y - oldY;
+                    mpt.mouseDrag(me.getSceneX(), me.getSceneY());
                     // update camera rotation
-                    rotateX.setAngle(rotateX.getAngle() - (deltaY * TURNTABLE_COEFF));
-                    rotateZ.setAngle(rotateZ.getAngle() + (deltaX * TURNTABLE_COEFF));
+                    rotateX.setAngle(rotateX.getAngle() - (mpt.getDeltaY() * TURNTABLE_COEFF));
+                    rotateZ.setAngle(rotateZ.getAngle() + (mpt.getDeltaX() * TURNTABLE_COEFF));
                 }
             }
         };
         private final Rotate rotateX;
         private final Rotate rotateZ;
-        private double x;
-        private double y;
-        private double oldX;
-        private double oldY;
-        private double deltaX;
-        private double deltaY;
+        private final MousePositionTracker mpt = new MousePositionTracker();
     }
     
     /** Handle zooming. */
@@ -144,34 +132,28 @@ public final class TurntableCameraRig extends Group {
         private final EventHandler<MouseEvent> pressHandler = new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent me) {
                 if (me.getButton() == PAN_BUTTON) {
-                    x = me.getSceneX();
-                    y = me.getSceneY();
-                }
+                    mpt.mousePress(me.getSceneX(), me.getSceneY());
+                 }
             }
         };
         private final EventHandler<MouseEvent> dragHandler = new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent me) {
                 if (me.getButton() == PAN_BUTTON) {
                     // update position delta
-                    oldX = x;
-                    oldY = y;
-                    x = me.getSceneX();
-                    y = me.getSceneY();
-                    deltaX = x - oldX;
-                    deltaY = y - oldY;
+                    mpt.mouseDrag(me.getSceneX(), me.getSceneY());
                     // z distance of camera
                     zDistance = zOffset.getZ();
                     // find local x and y vectors for the camera
                     Point3D camX = rotateZ.transform(rotateX.transform(xvec));
                     Point3D camY = rotateZ.transform(rotateX.transform(yvec));
                     // x shift
-                    panTran.setX(panTran.getX() + (PAN_COEFF * deltaX * zDistance * camX.getX()));
-                    panTran.setY(panTran.getY() + (PAN_COEFF * deltaX * zDistance * camX.getY()));
-                    panTran.setZ(panTran.getZ() + (PAN_COEFF * deltaX * zDistance * camX.getZ()));
+                    panTran.setX(panTran.getX() + (PAN_COEFF * mpt.getDeltaX() * zDistance * camX.getX()));
+                    panTran.setY(panTran.getY() + (PAN_COEFF * mpt.getDeltaX() * zDistance * camX.getY()));
+                    panTran.setZ(panTran.getZ() + (PAN_COEFF * mpt.getDeltaX() * zDistance * camX.getZ()));
                     // y shift
-                    panTran.setX(panTran.getX() + (PAN_COEFF * deltaY * zDistance * camY.getX()));
-                    panTran.setY(panTran.getY() + (PAN_COEFF * deltaY * zDistance * camY.getY()));
-                    panTran.setZ(panTran.getZ() + (PAN_COEFF * deltaY * zDistance * camY.getZ()));                    
+                    panTran.setX(panTran.getX() + (PAN_COEFF * mpt.getDeltaY() * zDistance * camY.getX()));
+                    panTran.setY(panTran.getY() + (PAN_COEFF * mpt.getDeltaY() * zDistance * camY.getY()));
+                    panTran.setZ(panTran.getZ() + (PAN_COEFF * mpt.getDeltaY() * zDistance * camY.getZ()));                    
                 }
             }
         };
@@ -181,12 +163,7 @@ public final class TurntableCameraRig extends Group {
         private final Translate zOffset;
         private final Point3D xvec = new Point3D(1, 0, 0);
         private final Point3D yvec = new Point3D(0, 1, 0);
-        private double x;
-        private double y;
-        private double oldX;
-        private double oldY;
-        private double deltaX;
-        private double deltaY;
+        private final MousePositionTracker mpt = new MousePositionTracker();
         private double zDistance;
     }
     
