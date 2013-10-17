@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -30,7 +31,8 @@ public final class ArcballSampleApp extends Application {
         Menu menuView = new Menu("View");
         MenuItem viewAll = new MenuItem("View all");
         viewAll.setOnAction(viewAllHandler);
-        menuView.getItems().add(viewAll);
+        CheckMenuItem viewProperties = new CheckMenuItem("View properties");
+        menuView.getItems().addAll(viewAll, viewProperties);
         menuBar.getMenus().addAll(menuFile, menuView);
         baseVBox.getChildren().add(menuBar);
         
@@ -73,9 +75,12 @@ public final class ArcballSampleApp extends Application {
         Group geometryGroup = new Group();
         
         Group atomGroup = new Group();
+        Group bondGroup = new Group();
         PDBSource pdbSource = new PDBSource(new File("1BNA.pdb"));
-        atomGroup.getChildren().addAll(pdbSource.getAtoms(0.5));
+        atomGroup.getChildren().addAll(pdbSource.getAtoms(0.4));
+        bondGroup.getChildren().addAll(pdbSource.getBonds(0.2));
         geometryGroup.getChildren().add(atomGroup);
+        geometryGroup.getChildren().add(bondGroup);
         
         return geometryGroup;
     }
@@ -84,6 +89,5 @@ public final class ArcballSampleApp extends Application {
     
     private static final int DEFAULT_WIDTH  = 1024;
     private static final int DEFAULT_HEIGHT = 768;
-    private static final double CUBE_SIZE = 1;
     
 }
