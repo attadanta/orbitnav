@@ -1,5 +1,6 @@
 package org.arcball;
 
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
@@ -9,5 +10,8 @@ public interface CameraRig {
     void detachFromScene(Scene scene);
     void attachToSubScene(SubScene subscene);
     void detachFromSubScene(SubScene subscene);
-    public void encompassBounds(Bounds bounds, double animationDurationMillis);
+    void encompassBounds(Bounds bounds, double animationDurationMillis);
+    
+    ReadOnlyObjectProperty<CameraTo2DTransform> viewTransformProperty();
+    CameraTo2DTransform getViewTransform();
 }

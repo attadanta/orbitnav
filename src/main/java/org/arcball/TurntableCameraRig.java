@@ -9,16 +9,20 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
+import javafx.geometry.Point3D;
 import javafx.scene.Camera;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
+import javafx.scene.transform.Affine;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.util.Duration;
@@ -122,6 +126,9 @@ public final class TurntableCameraRig extends Group implements CameraRig {
     public void setDistanceFromOrigin(double distance) { distanceFromOrigin.set(distance); }
     public double getDistanceFromOrigin() { return distanceFromOrigin.get(); }
     
+    public ReadOnlyObjectProperty<CameraTo2DTransform> viewTransformProperty() { return viewTransform; }
+    public CameraTo2DTransform getViewTransform() { return viewTransform.get(); }
+    
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
     private Scene scene = null;
@@ -140,6 +147,9 @@ public final class TurntableCameraRig extends Group implements CameraRig {
     private final InteractionScrollZoom  zoom      = new InteractionScrollZoom(distanceFromOrigin);
     private final InteractionPan         pan       = new InteractionPan(originX, originY, originZ, zRotation,
                                                                         xRotation, distanceFromOrigin);
+    
+    private final ObjectProperty<CameraTo2DTransform> viewTransform =
+            new SimpleObjectProperty<CameraTo2DTransform>(this, "viewTransform", new MyCameraTo2DTransform());
     
     private void buildTree() {
         // camera change listener
@@ -161,6 +171,14 @@ public final class TurntableCameraRig extends Group implements CameraRig {
         // set up transforms
         this.getTransforms().addAll(panTranslation, rotateZ, rotateX, zOffset);
         this.getChildren().add(getCamera());
+        
+        // bind all changes in the properties to the viewChangeListener
+        originX.addListener(viewChangeListener);
+        originY.addListener(viewChangeListener);
+        originZ.addListener(viewChangeListener);
+        xRotation.addListener(viewChangeListener);
+        zRotation.addListener(viewChangeListener);
+        distanceFromOrigin.addListener(viewChangeListener);        
     }
     
     private final ChangeListener<Camera> cameraChangeListener = new ChangeListener<Camera>() {
@@ -175,5 +193,78 @@ public final class TurntableCameraRig extends Group implements CameraRig {
             }
         }
     };
+    
+    private final ChangeListener<Number> viewChangeListener = new ChangeListener<Number>() {
+        @Override public void changed(ObservableValue<? extends Number> ob, Number oldValue, Number newValue) {
+            PerspectiveCamera pCamera = (PerspectiveCamera)getCamera();
+            double width = subscene.getWidth();
+            double height = subscene.getHeight();
+            double fov;
+            if (pCamera.isVerticalFieldOfView()) {
+                double fovrad = pCamera.getFieldOfView() * Math.PI / 180.0;
+                double hfovrad = 2.0 * Math.atan((width / height) * Math.tan(fovrad / 2.0));
+                fov = hfovrad * 180.0 / Math.PI;
+            } else {
+                fov = pCamera.getFieldOfView();
+            }
+            viewTransform.set(new MyCameraTo2DTransform(getOriginX(), getOriginY(), getOriginZ(),
+                    getXRotation(), getZRotation(), getDistanceFromOrigin(), fov, width, height));
+        }
+    }; 
+        
+    private static final class MyCameraTo2DTransform implements CameraTo2DTransform {
+        public MyCameraTo2DTransform() { this(0, 0, 0, 0, 0, 0, 45.0, 1024, (768.0/2.0)); }
+        public MyCameraTo2DTransform(
+                double originX, double originY, double originZ,
+                double xRotation, double zRotation, double distanceFromOrigin,
+                double fov, double width, double height
+            ) {
+            this.originX = originX;
+            this.originY = originY;
+            this.originZ = originZ;
+            this.xRotation = xRotation;
+            this.zRotation = zRotation;
+            this.distanceFromOrigin = distanceFromOrigin;
+            this.fov = fov;
+            this.width = width;
+            this.height = height;
+        }
+        @Override public Point2D transform(double x, double y, double z) {
+            affine.setToIdentity();
+            affine.appendTranslation(0, 0, distanceFromOrigin);
+            affine.appendRotation(-xRotation, 0, 0, 0, 1, 0, 0);
+            affine.appendRotation(-zRotation, 0, 0, 0, 0, 0, 1);
+            affine.appendTranslation(-originX, -originY, -originZ);
+            Point3D p3d = affine.transform(x, y, z);
+            final double f = 1.0 / Math.tan(fov * Math.PI / 180.0 / 2.0);
+            final double w2 = width / 2.0;
+            final double xprime = f * w2 * p3d.getX() / p3d.getZ() + w2;
+            final double yprime = f * w2 * p3d.getY() / p3d.getZ() + (height / 2.0);
+            return new Point2D(xprime, yprime);
+        }
+        @Override public double transformRadius(double x, double y, double z, double radius) {
+            affine.setToIdentity();
+            affine.appendTranslation(0, 0, distanceFromOrigin);
+            affine.appendRotation(-xRotation, 0, 0, 0, 1, 0, 0);
+            affine.appendRotation(-zRotation, 0, 0, 0, 0, 0, 1);
+            affine.appendTranslation(-originX, -originY, -originZ);
+            Point3D p3d = affine.transform(x, y, z);
+            final double f = 1.0 / Math.tan(fov * Math.PI / 180.0 / 2.0);
+            final double w2 = width / 2.0;
+            final double xprime      = f * w2 * p3d.getX() / p3d.getZ() + w2;
+            final double xprimeprime = f * w2 * (p3d.getX() + radius) / p3d.getZ() + w2;
+            return Math.abs(xprimeprime - xprime);
+        }
+        private final double originX;
+        private final double originY;
+        private final double originZ;
+        private final double xRotation;
+        private final double zRotation;
+        private final double distanceFromOrigin;
+        private final double fov;
+        private final double width;
+        private final double height;
+        private final Affine affine = new Affine();
+    }
     
 }

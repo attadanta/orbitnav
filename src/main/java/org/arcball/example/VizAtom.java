@@ -1,6 +1,7 @@
 package org.arcball.example;
 
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
@@ -17,9 +18,15 @@ public final class VizAtom extends Group {
         init();
     }
     
+    public boolean containsNode(Node n) { return (n == sphere); }
+    
+    public String getElementName() { return atom.getElement().name(); }
+    
     public double getX() { return atom.getCoords()[0]; }
     public double getY() { return atom.getCoords()[1]; }
     public double getZ() { return atom.getCoords()[2]; }
+    
+    public double getRadius() { return radius; }
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
 
@@ -36,7 +43,7 @@ public final class VizAtom extends Group {
     };
     
     private void init() {
-        Sphere sphere = new Sphere(radius, NUM_SPHERE_DIVISIONS);
+        sphere = new Sphere(radius, NUM_SPHERE_DIVISIONS);
         sphere.setTranslateX(getX());
         sphere.setTranslateY(getY());
         sphere.setTranslateZ(getZ());
@@ -56,6 +63,7 @@ public final class VizAtom extends Group {
         return material;
     }
 
+    private Sphere sphere;
     private final Atom atom;
     private final double radius;
     
