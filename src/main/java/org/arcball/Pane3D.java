@@ -13,7 +13,7 @@ import javafx.scene.paint.Paint;
 /**
  * A Pane that contains and automatically re-sizes a SubScene.
  * 
- * @author Jonathan Merritt <j.s.merritt@gmail.com>
+ * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
  */
 public final class Pane3D extends Pane {
 

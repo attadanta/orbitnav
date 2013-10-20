@@ -52,10 +52,12 @@ public final class InteractionPan {
     private final DragHandler dragHandler = new DragHandler() {
         public void handleDrag(double deltaX, double deltaY) {
             // camera's z distance
-            double zDistance = distanceFromOrigin.get();
+            final double zDistance = distanceFromOrigin.get();
             // find local x and y vector shifts for the camera
-            Point3D dxVec = rotateZ.transform(rotateX.transform(startingXVec)).multiply(coeff * zDistance * deltaX);
-            Point3D dyVec = rotateZ.transform(rotateX.transform(startingYVec)).multiply(coeff * zDistance * deltaY);
+            final Point3D dxVec = 
+                    rotateZ.transform(rotateX.transform(startingXVec)).multiply(coeff * zDistance * deltaX);
+            final Point3D dyVec = 
+                    rotateZ.transform(rotateX.transform(startingYVec)).multiply(coeff * zDistance * deltaY);
             // perform shifts along x and y
             originX.set(originX.get() - dxVec.getX() - dyVec.getX());
             originY.set(originY.get() - dxVec.getY() - dyVec.getY());
