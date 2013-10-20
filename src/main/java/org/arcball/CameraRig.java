@@ -4,6 +4,7 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
+import javafx.scene.transform.Transform;
 
 public interface CameraRig {
     void attachToScene(Scene scene);
@@ -14,4 +15,6 @@ public interface CameraRig {
     
     ReadOnlyObjectProperty<CameraTo2DTransform> viewTransformProperty();
     CameraTo2DTransform getViewTransform();
+    ReadOnlyObjectProperty<Transform> rotationOnlyComponentProperty();
+    Transform getRotationOnlyComponent();
 }

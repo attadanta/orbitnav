@@ -39,12 +39,14 @@ public final class DragHelper {
     
     private MouseButton triggerButton;
     private DragHandler dragHandler;
-    private final MousePositionTracker mpt = new MousePositionTracker();
+    private double x;
+    private double y;
     
     private final EventHandler<MouseEvent> mousePressHandler = new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent me) {
             if (me.getButton() == triggerButton) {
-                mpt.mousePress(me.getSceneX(), me.getSceneY());
+                x = me.getSceneX();
+                y = me.getSceneY();
             }
         }
     };
@@ -52,8 +54,11 @@ public final class DragHelper {
     private final EventHandler<MouseEvent> mouseDragHandler = new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent me) {
             if (me.getButton() == triggerButton) {
-                mpt.mouseDrag(me.getSceneX(), me.getSceneY());
-                dragHandler.handleDrag(mpt.getDeltaX(), mpt.getDeltaY());
+                double oldX = x;
+                double oldY = y;
+                x = me.getSceneX();
+                y = me.getSceneY();
+                dragHandler.handleDrag(x - oldX, y - oldY);
             }
         }
     };

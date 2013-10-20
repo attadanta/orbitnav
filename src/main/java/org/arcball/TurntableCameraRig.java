@@ -24,6 +24,7 @@ import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 import javafx.util.Duration;
 
@@ -128,6 +129,9 @@ public final class TurntableCameraRig extends Group implements CameraRig {
     
     public ReadOnlyObjectProperty<CameraTo2DTransform> viewTransformProperty() { return viewTransform; }
     public CameraTo2DTransform getViewTransform() { return viewTransform.get(); }
+    
+    public ReadOnlyObjectProperty<Transform> rotationOnlyComponentProperty() { return null; }
+    public Transform getRotationOnlyComponent() { return null; }
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
