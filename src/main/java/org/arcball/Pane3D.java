@@ -5,10 +5,14 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Group;
+import javafx.scene.PerspectiveCamera;
 import javafx.scene.SubScene;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Box;
+import javafx.scene.transform.NonInvertibleTransformException;
+import javafx.scene.transform.Transform;
 
 /**
  * A Pane that contains and automatically re-sizes a SubScene.
@@ -47,13 +51,31 @@ public final class Pane3D extends Pane {
     
     private final SubScene subScene = new SubScene(getRoot(), 8, 8, true, true);
     
+    private final Group axisRoot = new Group();
+    private final SubScene axisSubscene = new SubScene(axisRoot, 128, 128, true, true);
+    
     private void init() {
         subScene.fillProperty().bind(fill);
-        getChildren().add(subScene);
+        getChildren().addAll(subScene, axisSubscene);
         widthProperty().addListener(widthChangeListener);
         heightProperty().addListener(heightChangeListener);
         cameraRigProperty().addListener(rigChangeListener);
         setCameraRig(new TurntableCameraRig());
+        
+        PerspectiveCamera axisCamera = new PerspectiveCamera(true);
+        axisCamera.setTranslateZ(-10);
+        axisSubscene.setCamera(axisCamera);
+        axisSubscene.setDisable(true);
+        final Box axisBox = new Box();
+        getCameraRig().rotationOnlyComponentProperty().addListener(new ChangeListener<Transform>() {
+            @Override public void changed(ObservableValue<? extends Transform> ob, Transform old, Transform newt) {
+                axisBox.getTransforms().clear();
+                try {
+                    axisBox.getTransforms().add(newt.createInverse());
+                } catch (NonInvertibleTransformException ex) { /* should never happen */ }
+            }
+        });
+        axisRoot.getChildren().add(axisBox);
     }
             
     private final ChangeListener<Number> widthChangeListener = new ChangeListener<Number>() {

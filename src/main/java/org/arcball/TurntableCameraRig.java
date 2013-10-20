@@ -130,8 +130,8 @@ public final class TurntableCameraRig extends Group implements CameraRig {
     public ReadOnlyObjectProperty<CameraTo2DTransform> viewTransformProperty() { return viewTransform; }
     public CameraTo2DTransform getViewTransform() { return viewTransform.get(); }
     
-    public ReadOnlyObjectProperty<Transform> rotationOnlyComponentProperty() { return null; }
-    public Transform getRotationOnlyComponent() { return null; }
+    public ReadOnlyObjectProperty<Transform> rotationOnlyComponentProperty() { return rotationOnlyComponent; }
+    public Transform getRotationOnlyComponent() { return rotationOnlyComponent.get(); }
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
@@ -154,6 +154,8 @@ public final class TurntableCameraRig extends Group implements CameraRig {
     
     private final ObjectProperty<CameraTo2DTransform> viewTransform =
             new SimpleObjectProperty<CameraTo2DTransform>(this, "viewTransform", new MyCameraTo2DTransform());
+    private final ObjectProperty<Transform> rotationOnlyComponent =
+            new SimpleObjectProperty<Transform>(this, "rotationOnlyComponent", new Affine());
     
     private void buildTree() {
         // camera change listener
@@ -213,6 +215,11 @@ public final class TurntableCameraRig extends Group implements CameraRig {
             }
             viewTransform.set(new MyCameraTo2DTransform(getOriginX(), getOriginY(), getOriginZ(),
                     getXRotation(), getZRotation(), getDistanceFromOrigin(), fov, width, height));
+            
+            Affine roc = new Affine();
+            roc.appendRotation(getZRotation(), 0, 0, 0, 0, 0, 1);
+            roc.appendRotation(getXRotation(), 0, 0, 0, 1, 0, 0);
+            rotationOnlyComponent.set(roc);
         }
     }; 
         
