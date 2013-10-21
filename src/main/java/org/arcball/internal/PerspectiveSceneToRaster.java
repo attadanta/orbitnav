@@ -10,6 +10,12 @@ import javafx.scene.transform.Transform;
 
 import org.arcball.CameraToRasterTransform;
 
+/**
+ * A {@link org.arcball.CameraToRasterTransform CameraToRasterTransform} that uses a rigid body transformation plus
+ * a <code>PerspectiveCamera</code>.
+ * 
+ * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
+ */
 public final class PerspectiveSceneToRaster implements CameraToRasterTransform {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
@@ -23,6 +29,8 @@ public final class PerspectiveSceneToRaster implements CameraToRasterTransform {
         this.transformRotationTranslation = transformRotationTranslation;
         this.width = width;
         this.height = height;
+        this.w2 = this.width / 2.0;
+        this.h2 = this.height / 2.0;
     }
     
     public void setParameters(PerspectiveCamera camera, Transform transformRotationTranslation, Scene scene) {
@@ -38,12 +46,8 @@ public final class PerspectiveSceneToRaster implements CameraToRasterTransform {
         try {
             p3d = transformRotationTranslation.inverseTransform(x, y, z);
         } catch (NonInvertibleTransformException ex) { /* should not occur! */ }
-        final double w2 = width / 2.0;
-        final double h2 = height / 2.0;
         final double c = focalLength() * w2 / p3d.getZ();
-        final double xprime = c * p3d.getX() + w2;
-        final double yprime = c * p3d.getY() + h2;
-        return new Point2D(xprime, yprime);
+        return new Point2D(c * p3d.getX() + w2, c * p3d.getY() + h2);
     }
     
     @Override public double transformRadius(double x, double y, double z, double radius) {
@@ -51,11 +55,7 @@ public final class PerspectiveSceneToRaster implements CameraToRasterTransform {
         try {
             p3d = transformRotationTranslation.inverseTransform(x, y, z);
         } catch (NonInvertibleTransformException ex) { /* should not occur! */ }
-        final double w2 = width / 2.0;
-        final double c = focalLength() * w2 / p3d.getZ();
-        final double xprime = c * p3d.getX() + w2;
-        final double xpprime = c * (p3d.getX() + radius) + w2;
-        return Math.abs(xpprime - xprime);
+        return Math.abs(focalLength() * w2 * radius / p3d.getZ());
     }
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
@@ -64,6 +64,8 @@ public final class PerspectiveSceneToRaster implements CameraToRasterTransform {
     private Transform transformRotationTranslation;
     private double width;
     private double height;
+    private double w2;
+    private double h2;
     
     private double focalLength() {
         final double fov = Util.getHorizontalFieldOfView(camera, width, height);
