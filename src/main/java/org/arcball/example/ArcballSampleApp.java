@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import org.arcball.CameraRig;
-import org.arcball.CameraTo2DTransform;
+import org.arcball.CameraToRasterTransform;
 import org.arcball.Pane3D;
 import org.arcball.TurntableCameraRig;
 
@@ -69,8 +69,8 @@ public final class ArcballSampleApp extends Application {
         pane3D.getCameraRig().encompassBounds(geometryGroup.getBoundsInParent(), 0);
         
         TurntableCameraRig tcr = (TurntableCameraRig)pane3D.getCameraRig();
-        tcr.setZRotation(140);
-        tcr.setXRotation(260);
+        tcr.zRotationProperty().set(140);
+        tcr.xRotationProperty().set(260);
         updateViewPropertiesPane();
 
         pane3D.getChildren().add(viewPropertiesPane);
@@ -124,9 +124,9 @@ public final class ArcballSampleApp extends Application {
                     tempEllipse.setVisible(true);
                     System.out.println("Clicked atom " + atom.getElementName());
                     final VizAtom a2 = atom;
-                    pane3D.getCameraRig().viewTransformProperty().addListener(new ChangeListener<CameraTo2DTransform>() {
-                       @Override public void changed(ObservableValue<? extends CameraTo2DTransform> ob,
-                                                     CameraTo2DTransform oldTransform, CameraTo2DTransform newTransform) {
+                    pane3D.getCameraRig().transformSceneToRasterProperty().addListener(new ChangeListener<CameraToRasterTransform>() {
+                       @Override public void changed(ObservableValue<? extends CameraToRasterTransform> ob,
+                                                     CameraToRasterTransform oldTransform, CameraToRasterTransform newTransform) {
                            Point2D p = newTransform.transform(a2.getX(), a2.getY(), a2.getZ());
                            double r = newTransform.transformRadius(a2.getX(), a2.getY(), a2.getZ(), a2.getRadius());
                            tempEllipse.setCenterX(p.getX());
@@ -135,7 +135,7 @@ public final class ArcballSampleApp extends Application {
                            tempEllipse.setRadiusY(1.5 * r);
                        }
                     });
-                    CameraTo2DTransform x = pane3D.getCameraRig().getViewTransform();
+                    CameraToRasterTransform x = pane3D.getCameraRig().transformSceneToRasterProperty().get();
                     Point2D p = x.transform(a2.getX(), a2.getY(), a2.getZ());
                     double r = x.transformRadius(a2.getX(), a2.getY(), a2.getZ(), a2.getRadius());
                     tempEllipse.setCenterX(p.getX());

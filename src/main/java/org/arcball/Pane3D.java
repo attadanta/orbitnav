@@ -68,7 +68,7 @@ public final class Pane3D extends Pane {
         axisSubscene.setCamera(axisCamera);
         axisSubscene.setDisable(true);
         final AxisTriad axisTriad = new AxisTriad();
-        getCameraRig().rotationOnlyComponentProperty().addListener(new ChangeListener<Transform>() {
+        getCameraRig().transformRotationOnlyProperty().addListener(new ChangeListener<Transform>() {
             @Override public void changed(ObservableValue<? extends Transform> ob, Transform old, Transform newt) {
                 axisTriad.getTransforms().clear();
                 try {
