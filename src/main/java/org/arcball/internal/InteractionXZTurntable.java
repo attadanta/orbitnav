@@ -22,11 +22,20 @@ public final class InteractionXZTurntable {
     
     public void detachFromSubScene(SubScene subscene) { dragHelper.detachFromSubScene(subscene); }
     
+    public void setTriggerButton(MouseButton button) { dragHelper.setTriggerButton(button); }
+    
+    public MouseButton getTriggerButton() { return dragHelper.getTriggerButton(); }
+    
+    public void setRotationCoefficient(double coefficient) { coeff = coefficient; }
+    
+    public double getRotationCoefficient() { return coeff; }
+    
     //--------------------------------------------------------------------------------------------------------- PRIVATE
+    
+    private static final MouseButton DEFAULT_TRIGGER_BUTTON = MouseButton.PRIMARY;
     
     private final DoubleProperty xRotation;
     private final DoubleProperty zRotation;
-    private MouseButton triggerButton = MouseButton.PRIMARY;
     private double coeff = 0.4;
     
     private final DragHandler dragHandler = new DragHandler() {
@@ -37,6 +46,6 @@ public final class InteractionXZTurntable {
         }
     };
     
-    private final DragHelper dragHelper = new DragHelper(triggerButton, dragHandler);
+    private final DragHelper dragHelper = new DragHelper(DEFAULT_TRIGGER_BUTTON, dragHandler);
     
 }

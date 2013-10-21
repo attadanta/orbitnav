@@ -146,16 +146,16 @@ public final class TurntableCameraRig extends Group implements CameraRig {
     private final DoubleProperty zRotation          = new SimpleDoubleProperty(this, "zRotation", 0);
     private final DoubleProperty xRotation          = new SimpleDoubleProperty(this, "xRotation", 0);
     private final DoubleProperty distanceFromOrigin = new SimpleDoubleProperty(this, "distanceFromOrigin", 10);
-    
-    private final InteractionXZTurntable turntable = new InteractionXZTurntable(xRotation, zRotation);
-    private final InteractionScrollZoom  zoom      = new InteractionScrollZoom(distanceFromOrigin);
-    private final InteractionPan         pan       = new InteractionPan(originX, originY, originZ, zRotation,
-                                                                        xRotation, distanceFromOrigin);
-    
+        
     private final ObjectProperty<CameraTo2DTransform> viewTransform =
             new SimpleObjectProperty<CameraTo2DTransform>(this, "viewTransform", new MyCameraTo2DTransform());
     private final ObjectProperty<Transform> rotationOnlyComponent =
             new SimpleObjectProperty<Transform>(this, "rotationOnlyComponent", new Affine());
+
+    private final InteractionXZTurntable turntable = new InteractionXZTurntable(xRotation, zRotation);
+    private final InteractionScrollZoom  zoom      = new InteractionScrollZoom(distanceFromOrigin);
+    private final InteractionPan         pan       = new InteractionPan(originX, originY, originZ, 
+            rotationOnlyComponent, distanceFromOrigin);    
     
     // normalize angles
     private static double normalizeAngle(double angle) {

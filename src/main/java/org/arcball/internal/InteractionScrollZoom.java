@@ -22,6 +22,9 @@ public final class InteractionScrollZoom {
     
     public void detachFromSubScene(SubScene sscene) { sscene.removeEventHandler(ScrollEvent.SCROLL, scrollHandler); }
     
+    public void setZoomCoefficient(double coefficient) { coeff = coefficient; }
+    
+    public double getZoomCoefficient() { return coeff; }
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     

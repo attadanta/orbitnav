@@ -91,7 +91,7 @@ public final class DragHelper {
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
     private MouseButton triggerButton;
-    private DragHandler dragHandler;
+    private final DragHandler dragHandler;
     private double x;
     private double y;
     private Scene scene = null;
