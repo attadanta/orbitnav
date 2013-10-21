@@ -2,6 +2,11 @@ package org.arcball.internal;
 
 import javafx.scene.PerspectiveCamera;
 
+/**
+ * Ye olde Utility class.
+ * 
+ * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
+ */
 public final class Util {
 
     /**

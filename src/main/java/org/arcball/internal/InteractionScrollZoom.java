@@ -7,6 +7,11 @@ import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.input.ScrollEvent;
 
+/**
+ * Zoom interaction triggered by scroll events (eg. mouse wheel scroll).
+ * 
+ * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
+ */
 public final class InteractionScrollZoom {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC

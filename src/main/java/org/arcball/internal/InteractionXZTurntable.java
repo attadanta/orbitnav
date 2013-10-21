@@ -8,6 +8,11 @@ import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.input.MouseButton;
 
+/**
+ * Turntable interaction.
+ *
+ * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
+ */
 public final class InteractionXZTurntable {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
@@ -45,10 +50,12 @@ public final class InteractionXZTurntable {
     
     private final DragHandler dragHandler = new DragHandler() {
         public void handleDrag(double deltaX, double deltaY) {
+            final double oldXRot = xRotation.get();
+            final double oldZRot = zRotation.get();
             final double coeff = rotationCoefficient.get();
-            final double zRotationSign = (xRotation.get() > 180.0) ? (1.0) : (-1.0);
-            final double newXRotation = xRotation.get() - (coeff * deltaY);
-            final double newZRotation = zRotation.get() - (zRotationSign * coeff * deltaX); 
+            final double zRotationSign = (oldXRot > 180.0) ? (1.0) : (-1.0);
+            final double newXRotation = oldXRot - (coeff * deltaY);
+            final double newZRotation = oldZRot - (zRotationSign * coeff * deltaX); 
             xRotation.set(Util.normalizeAngle(newXRotation));
             zRotation.set(Util.normalizeAngle(newZRotation));
         }
