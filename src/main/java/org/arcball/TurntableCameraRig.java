@@ -157,6 +157,25 @@ public final class TurntableCameraRig extends Group implements CameraRig {
     private final ObjectProperty<Transform> rotationOnlyComponent =
             new SimpleObjectProperty<Transform>(this, "rotationOnlyComponent", new Affine());
     
+    // normalize angles
+    private static double normalizeAngle(double angle) {
+        if ((angle >= 0) && (angle <= 360.0)) {
+            return angle;
+        } else {
+            return angle - 360.0 * Math.floor(angle / 360.0);
+        }
+    }
+    private final ChangeListener<Number> zRotationAngleNormalizer = new ChangeListener<Number>() {
+        @Override public void changed(ObservableValue<? extends Number> ob, Number oldAngle, Number newAngle) {
+            setZRotation(normalizeAngle(newAngle.doubleValue()));
+        }
+    };
+    private final ChangeListener<Number> xRotationAngleNormalizer = new ChangeListener<Number>() {
+        @Override public void changed(ObservableValue<? extends Number> ob, Number oldAngle, Number newAngle) {
+            setXRotation(normalizeAngle(newAngle.doubleValue()));
+        }
+    };
+    
     private void buildTree() {
         // camera change listener
         camera.addListener(cameraChangeListener);
@@ -177,6 +196,10 @@ public final class TurntableCameraRig extends Group implements CameraRig {
         // set up transforms
         this.getTransforms().addAll(panTranslation, rotateZ, rotateX, zOffset);
         this.getChildren().add(getCamera());
+        
+        // bind listeners that normalize the angles
+        xRotation.addListener(xRotationAngleNormalizer);
+        zRotation.addListener(zRotationAngleNormalizer);
         
         // bind all changes in the properties to the viewChangeListener
         originX.addListener(viewChangeListener);

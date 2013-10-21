@@ -31,8 +31,9 @@ public final class InteractionXZTurntable {
     
     private final DragHandler dragHandler = new DragHandler() {
         public void handleDrag(double deltaX, double deltaY) {
+            final double zRotationSign = (xRotation.get() > 180.0) ? (1.0) : (-1.0);
             xRotation.set(xRotation.get() - (coeff * deltaY));
-            zRotation.set(zRotation.get() - (coeff * deltaX));
+            zRotation.set(zRotation.get() - (zRotationSign * coeff * deltaX));
         }
     };
     
