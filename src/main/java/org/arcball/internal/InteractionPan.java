@@ -37,13 +37,13 @@ public final class InteractionPan {
             @Override public void changed(ObservableValue<? extends PerspectiveCamera> ob,
                     PerspectiveCamera oldCamera, PerspectiveCamera newCamera)
             {
-                updateCoeff();
+                coeffDirty = true;
             }
         };
         // listen for other changes that affect the pan scale coefficient
         final ChangeListener<Number> coeffParamListener = new ChangeListener<Number>() {
             @Override public void changed(ObservableValue<? extends Number> ob, Number oldValue, Number newValue) {
-                updateCoeff();
+                coeffDirty = true;
             }
         };
         // attach listeners to properties that affect the pan scale coefficient
@@ -111,18 +111,23 @@ public final class InteractionPan {
     private final DoubleProperty width = new SimpleDoubleProperty(this, "width", 1.0);
     private final DoubleProperty height = new SimpleDoubleProperty(this, "height", 1.0);
     
+    private boolean coeffDirty = false;
     private double coeff;
     
     private void updateCoeff() {
-        PerspectiveCamera pCam = camera.get();
-        if (pCam != null) {
-            final double hfovRad = Math.toRadians(Util.getHorizontalFieldOfView(pCam, width.get(), height.get()));
-            coeff = 2.0 * distanceFromOrigin.get() * Math.tan(hfovRad / 2.0) / width.get();
+        if (coeffDirty) {
+            PerspectiveCamera pCam = camera.get();
+            if (pCam != null) {
+                final double hfovRad = Math.toRadians(Util.getHorizontalFieldOfView(pCam, width.get(), height.get()));
+                coeff = 2.0 * distanceFromOrigin.get() * Math.tan(hfovRad / 2.0) / width.get();
+            }
+            coeffDirty = false;
         }
     }
     
     private final DragHandler dragHandler = new DragHandler() {
         public void handleDrag(double deltaX, double deltaY) {
+            updateCoeff();
             // find local x and y vector shifts for the camera
             final Point3D dxVec = viewRotation.get().transform(STARTING_X_VEC).multiply(coeff * deltaX);
             final Point3D dyVec = viewRotation.get().transform(STARTING_Y_VEC).multiply(coeff * deltaY);
