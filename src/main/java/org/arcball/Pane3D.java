@@ -1,5 +1,7 @@
 package org.arcball;
 
+import org.arcball.internal.AxisTriad;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -10,7 +12,6 @@ import javafx.scene.SubScene;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Box;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Transform;
 
@@ -63,19 +64,19 @@ public final class Pane3D extends Pane {
         setCameraRig(new TurntableCameraRig());
         
         PerspectiveCamera axisCamera = new PerspectiveCamera(true);
-        axisCamera.setTranslateZ(-10);
+        axisCamera.setTranslateZ(-5);
         axisSubscene.setCamera(axisCamera);
         axisSubscene.setDisable(true);
-        final Box axisBox = new Box();
+        final AxisTriad axisTriad = new AxisTriad();
         getCameraRig().rotationOnlyComponentProperty().addListener(new ChangeListener<Transform>() {
             @Override public void changed(ObservableValue<? extends Transform> ob, Transform old, Transform newt) {
-                axisBox.getTransforms().clear();
+                axisTriad.getTransforms().clear();
                 try {
-                    axisBox.getTransforms().add(newt.createInverse());
+                    axisTriad.getTransforms().add(newt.createInverse());
                 } catch (NonInvertibleTransformException ex) { /* should never happen */ }
             }
         });
-        axisRoot.getChildren().add(axisBox);
+        axisRoot.getChildren().add(axisTriad);
     }
             
     private final ChangeListener<Number> widthChangeListener = new ChangeListener<Number>() {
