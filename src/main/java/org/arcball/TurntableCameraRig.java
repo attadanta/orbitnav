@@ -151,11 +151,14 @@ public final class TurntableCameraRig extends Group implements CameraRig {
             new SimpleObjectProperty<CameraTo2DTransform>(this, "viewTransform", new MyCameraTo2DTransform());
     private final ObjectProperty<Transform> rotationOnlyComponent =
             new SimpleObjectProperty<Transform>(this, "rotationOnlyComponent", new Affine());
+    
+    private final DoubleProperty hfov              = new SimpleDoubleProperty(this, "hfov", 35.0);
+    private final DoubleProperty width             = new SimpleDoubleProperty(this, "width", 1024.0);
 
     private final InteractionXZTurntable turntable = new InteractionXZTurntable(xRotation, zRotation);
     private final InteractionScrollZoom  zoom      = new InteractionScrollZoom(distanceFromOrigin);
     private final InteractionPan         pan       = new InteractionPan(originX, originY, originZ, 
-            rotationOnlyComponent, distanceFromOrigin);    
+            rotationOnlyComponent, distanceFromOrigin, hfov);
     
     // normalize angles
     private static double normalizeAngle(double angle) {
@@ -236,6 +239,8 @@ public final class TurntableCameraRig extends Group implements CameraRig {
             } else {
                 fov = pCamera.getFieldOfView();
             }
+            hfov.set(fov);
+            TurntableCameraRig.this.width.set(width);
             viewTransform.set(new MyCameraTo2DTransform(getOriginX(), getOriginY(), getOriginZ(),
                     getXRotation(), getZRotation(), getDistanceFromOrigin(), fov, width, height));
             
