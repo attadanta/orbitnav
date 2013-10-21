@@ -20,6 +20,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
+import javafx.scene.input.MouseButton;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 import javafx.util.Duration;
@@ -116,6 +117,14 @@ public final class TurntableCameraRig implements CameraRig {
     public DoubleProperty xRotationProperty() { return xRotation; }
     
     public DoubleProperty distanceFromOriginProperty() { return distanceFromOrigin; }
+    
+    public ObjectProperty<MouseButton> mouseButtonPanProperty() { return pan.triggerButtonProperty(); }
+    
+    public ObjectProperty<MouseButton> mouseButtonRotateProperty() { return turntable.triggerButtonProperty(); }
+    
+    public DoubleProperty rotationCoefficientProperty() { return turntable.rotationCoefficientProperty(); }
+    
+    public DoubleProperty zoomCoefficientProperty() { return zoom.zoomCoefficientProperty(); }
     
     public ReadOnlyObjectProperty<CameraToRasterTransform> transformSceneToRasterProperty() { 
         return transformSceneToRaster; 
