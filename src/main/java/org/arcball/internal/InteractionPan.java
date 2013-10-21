@@ -16,10 +16,25 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 
+/**
+ * Panning interaction.
+ * 
+ * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
+ */
 public final class InteractionPan {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
     
+    /**
+     * Creates a new instance of <code>InteractionPan</code>.
+     * 
+     * @param originX origin x property
+     * @param originY origin y property
+     * @param originZ origin z property
+     * @param viewRotation rotation-only component of the viewing transformation
+     * @param distanceFromOrigin distance from origin
+     * @param camera camera property
+     */
     public InteractionPan(DoubleProperty originX, DoubleProperty originY, DoubleProperty originZ,
                           ReadOnlyObjectProperty<Transform> viewRotation, ReadOnlyDoubleProperty distanceFromOrigin,
                           ReadOnlyObjectProperty<PerspectiveCamera> camera)
@@ -34,7 +49,7 @@ public final class InteractionPan {
         
         // listen for changes to the camera (to update the pan scale coefficient)
         final ChangeListener<PerspectiveCamera> cameraChangeListener = new ChangeListener<PerspectiveCamera>() {
-            @Override public void changed(ObservableValue<? extends PerspectiveCamera> ob,
+            @Override public void changed(ObservableValue<? extends PerspectiveCamera> ob, 
                     PerspectiveCamera oldCamera, PerspectiveCamera newCamera)
             {
                 coeffDirty = true;
