@@ -2,13 +2,18 @@ package org.arcball.internal;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point3D;
+import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.input.MouseButton;
+import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 
 public final class InteractionPan {
@@ -16,67 +21,111 @@ public final class InteractionPan {
     //---------------------------------------------------------------------------------------------------------- PUBLIC
     
     public InteractionPan(DoubleProperty originX, DoubleProperty originY, DoubleProperty originZ,
-                          ObjectProperty<Transform> rotationComponent, DoubleProperty distanceFromOrigin,
-                          DoubleProperty hfov)
+                          ReadOnlyObjectProperty<Transform> viewRotation, ReadOnlyDoubleProperty distanceFromOrigin,
+                          ReadOnlyObjectProperty<PerspectiveCamera> camera)
     {
-        this.originX = originX;
-        this.originY = originY;
-        this.originZ = originZ;
-        this.rotation = rotationComponent;
-        this.distanceFromOrigin = distanceFromOrigin;
-        this.hfov = hfov;
+        // bind basic properties
+        this.originX.bindBidirectional(originX);
+        this.originY.bindBidirectional(originY);
+        this.originZ.bindBidirectional(originZ);
+        this.viewRotation.bind(viewRotation);
+        this.distanceFromOrigin.bind(distanceFromOrigin);
+        this.camera.bind(camera);
         
-        this.distanceFromOrigin.addListener(coeffUpdater);
-        this.hfov.addListener(coeffUpdater);
-        this.width.addListener(coeffUpdater);
+        // listen for changes to the camera (to update the pan scale coefficient)
+        final ChangeListener<PerspectiveCamera> cameraChangeListener = new ChangeListener<PerspectiveCamera>() {
+            @Override public void changed(ObservableValue<? extends PerspectiveCamera> ob,
+                    PerspectiveCamera oldCamera, PerspectiveCamera newCamera)
+            {
+                updateCoeff();
+            }
+        };
+        // listen for other changes that affect the pan scale coefficient
+        final ChangeListener<Number> coeffParamListener = new ChangeListener<Number>() {
+            @Override public void changed(ObservableValue<? extends Number> ob, Number oldValue, Number newValue) {
+                updateCoeff();
+            }
+        };
+        // attach listeners to properties that affect the pan scale coefficient
+        this.distanceFromOrigin.addListener(coeffParamListener);
+        this.width.addListener(coeffParamListener);
+        this.height.addListener(coeffParamListener);
+        this.camera.addListener(cameraChangeListener);
     }
         
     public void attachToScene(Scene scene) { 
         dragHelper.attachToScene(scene);
         width.bind(scene.widthProperty());
+        height.bind(scene.heightProperty());
     }
     
     public void detachFromScene(Scene scene) { 
         dragHelper.detachFromScene(scene);
         width.unbind();
+        height.unbind();
     }
     
     public void attachToSubScene(SubScene subscene) {
         dragHelper.attachToSubScene(subscene);
         width.bind(subscene.widthProperty());
+        height.bind(subscene.heightProperty());
     }
     
     public void detachFromSubScene(SubScene subscene) { 
         dragHelper.detachFromSubScene(subscene);
         width.unbind();
+        height.unbind();
     }
+        
+    public ObjectProperty<MouseButton> triggerButtonProperty() { return triggerButton; }
     
-    public void setTriggerButton(MouseButton button) { triggerButton = button; }
+    public DoubleProperty originXProperty() { return originX; }
     
-    public MouseButton getTriggerButton() { return triggerButton; }
+    public DoubleProperty originYProperty() { return originY; }
+    
+    public DoubleProperty originZProperty() { return originZ; }
+    
+    public ObjectProperty<Transform> viewRotationProperty() { return viewRotation; }
+    
+    public DoubleProperty distanceFromOriginProperty() { return distanceFromOrigin; }
+    
+    public ObjectProperty<PerspectiveCamera> cameraProperty() { return camera; }
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
     private final static MouseButton DEFAULT_TRIGGER_BUTTON = MouseButton.SECONDARY;
     private final static Point3D STARTING_X_VEC = new Point3D(1, 0, 0);
     private final static Point3D STARTING_Y_VEC = new Point3D(0, 1, 0);
+
+    private final ObjectProperty<MouseButton> triggerButton = 
+            new SimpleObjectProperty<MouseButton>(this, "triggerButton", DEFAULT_TRIGGER_BUTTON);    
+    private final DoubleProperty originX = new SimpleDoubleProperty(this, "originX", 0);
+    private final DoubleProperty originY = new SimpleDoubleProperty(this, "originY", 0);
+    private final DoubleProperty originZ = new SimpleDoubleProperty(this, "originZ", 0);
+    private final ObjectProperty<Transform> viewRotation = 
+            new SimpleObjectProperty<Transform>(this, "viewRotation", new Affine());
+    private final DoubleProperty distanceFromOrigin = new SimpleDoubleProperty(this, "distanceFromOrigin", 10);
+    private final ObjectProperty<PerspectiveCamera> camera = 
+            new SimpleObjectProperty<PerspectiveCamera>(this, "camera", null);
     
-    private final DoubleProperty originX;
-    private final DoubleProperty originY;
-    private final DoubleProperty originZ;
-    private final ObjectProperty<Transform> rotation;
-    private final DoubleProperty distanceFromOrigin;
-    private final DoubleProperty hfov;
     private final DoubleProperty width = new SimpleDoubleProperty(this, "width", 1.0);
+    private final DoubleProperty height = new SimpleDoubleProperty(this, "height", 1.0);
+    
     private double coeff;
     
-    private MouseButton triggerButton = DEFAULT_TRIGGER_BUTTON;
+    private void updateCoeff() {
+        PerspectiveCamera pCam = camera.get();
+        if (pCam != null) {
+            final double hfovRad = Math.toRadians(Util.getHorizontalFieldOfView(pCam, width.get(), height.get()));
+            coeff = 2.0 * distanceFromOrigin.get() * Math.tan(hfovRad / 2.0) / width.get();
+        }
+    }
     
     private final DragHandler dragHandler = new DragHandler() {
         public void handleDrag(double deltaX, double deltaY) {
             // find local x and y vector shifts for the camera
-            final Point3D dxVec = rotation.get().transform(STARTING_X_VEC).multiply(coeff * deltaX);
-            final Point3D dyVec = rotation.get().transform(STARTING_Y_VEC).multiply(coeff * deltaY);
+            final Point3D dxVec = viewRotation.get().transform(STARTING_X_VEC).multiply(coeff * deltaX);
+            final Point3D dyVec = viewRotation.get().transform(STARTING_Y_VEC).multiply(coeff * deltaY);
             // perform shifts along x and y
             originX.set(originX.get() - dxVec.getX() - dyVec.getX());
             originY.set(originY.get() - dxVec.getY() - dyVec.getY());
@@ -85,12 +134,5 @@ public final class InteractionPan {
     };
 
     private final DragHelper dragHelper = new DragHelper(triggerButton, dragHandler);
-    
-    private final ChangeListener<Number> coeffUpdater = new ChangeListener<Number>() {
-        @Override public void changed(ObservableValue<? extends Number> ob, Number oldValue, Number newValue) {
-            final double fovRad = hfov.get() * Math.PI / 180.0;
-            coeff = 2.0 * distanceFromOrigin.get() * Math.tan(fovRad / 2.0) / width.get();
-        }
-    };
-    
+        
 }

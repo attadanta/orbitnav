@@ -1,5 +1,7 @@
 package org.arcball.internal;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
@@ -25,8 +27,8 @@ public final class DragHelper {
      * @param triggerButton the mouse button required to trigger the drag
      * @param dragHandler the handler attached to this helper
      */
-    public DragHelper(MouseButton triggerButton, DragHandler dragHandler) {
-        this.triggerButton = triggerButton;
+    public DragHelper(ObjectProperty<MouseButton> triggerButton, DragHandler dragHandler) {
+        this.triggerButton.bind(triggerButton);
         this.dragHandler = dragHandler;
     }
     
@@ -80,17 +82,24 @@ public final class DragHelper {
      * Sets the button which will trigger the drags that are monitored by this helper.
      * @param b triggering mouse button
      */
-    public void setTriggerButton(MouseButton b) { triggerButton = b; }
+    public void setTriggerButton(MouseButton b) { triggerButton.set(b); }
     
     /**
      * Gets the button which triggers the drags that are monitored by this helper.
      * @return triggering mouse button
      */
-    public MouseButton getTriggerButton() { return triggerButton; } 
+    public MouseButton getTriggerButton() { return triggerButton.get(); }
+    
+    /**
+     * Returns the trigger button property.
+     * @return trigger button property
+     */
+    public ObjectProperty<MouseButton> triggerButtonProperty() { return triggerButton; }
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
-    private MouseButton triggerButton;
+    private ObjectProperty<MouseButton> triggerButton = 
+            new SimpleObjectProperty<MouseButton>(this, "triggerButton", MouseButton.PRIMARY);
     private final DragHandler dragHandler;
     private double x;
     private double y;
@@ -99,7 +108,7 @@ public final class DragHelper {
     
     private final EventHandler<MouseEvent> mousePressHandler = new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent me) {
-            if (me.getButton() == triggerButton) {
+            if (me.getButton() == triggerButton.get()) {
                 x = me.getSceneX();
                 y = me.getSceneY();
             }
@@ -108,7 +117,7 @@ public final class DragHelper {
     
     private final EventHandler<MouseEvent> mouseDragHandler = new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent me) {
-            if (me.getButton() == triggerButton) {
+            if (me.getButton() == triggerButton.get()) {
                 final double oldX = x;
                 final double oldY = y;
                 x = me.getSceneX();

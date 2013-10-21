@@ -3,6 +3,7 @@ package org.arcball;
 import org.arcball.internal.InteractionXZTurntable;
 import org.arcball.internal.InteractionScrollZoom;
 import org.arcball.internal.InteractionPan;
+import org.arcball.internal.Util;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -99,9 +100,9 @@ public final class TurntableCameraRig extends Group implements CameraRig {
         }
     }
     
-    public ObjectProperty<Camera> cameraProperty() { return camera; }
-    public void setCamera(Camera camera) { this.camera.set(camera); }
-    public Camera getCamera() { return camera.get(); }
+    public ObjectProperty<PerspectiveCamera> cameraProperty() { return camera; }
+    public void setCamera(PerspectiveCamera camera) { this.camera.set(camera); }
+    public PerspectiveCamera getCamera() { return camera.get(); }
     
     public DoubleProperty originXProperty() { return originX; }
     public void setOriginX(double originX) { this.originX.set(originX); }
@@ -138,8 +139,8 @@ public final class TurntableCameraRig extends Group implements CameraRig {
     private Scene scene = null;
     private SubScene subscene = null;
     
-    private final ObjectProperty<Camera> camera     = new SimpleObjectProperty<Camera>(this, "camera", 
-                                                                                       new PerspectiveCamera(true));
+    private final ObjectProperty<PerspectiveCamera> camera = 
+            new SimpleObjectProperty<PerspectiveCamera>(this, "camera", new PerspectiveCamera(true));
     private final DoubleProperty originX            = new SimpleDoubleProperty(this, "originX", 0);
     private final DoubleProperty originY            = new SimpleDoubleProperty(this, "originY", 0);
     private final DoubleProperty originZ            = new SimpleDoubleProperty(this, "originZ", 0);
@@ -158,24 +159,16 @@ public final class TurntableCameraRig extends Group implements CameraRig {
     private final InteractionXZTurntable turntable = new InteractionXZTurntable(xRotation, zRotation);
     private final InteractionScrollZoom  zoom      = new InteractionScrollZoom(distanceFromOrigin);
     private final InteractionPan         pan       = new InteractionPan(originX, originY, originZ, 
-            rotationOnlyComponent, distanceFromOrigin, hfov);
+            rotationOnlyComponent, distanceFromOrigin, camera);
     
-    // normalize angles
-    private static double normalizeAngle(double angle) {
-        if ((angle >= 0) && (angle <= 360.0)) {
-            return angle;
-        } else {
-            return angle - 360.0 * Math.floor(angle / 360.0);
-        }
-    }
     private final ChangeListener<Number> zRotationAngleNormalizer = new ChangeListener<Number>() {
         @Override public void changed(ObservableValue<? extends Number> ob, Number oldAngle, Number newAngle) {
-            setZRotation(normalizeAngle(newAngle.doubleValue()));
+            setZRotation(Util.normalizeAngle(newAngle.doubleValue()));
         }
     };
     private final ChangeListener<Number> xRotationAngleNormalizer = new ChangeListener<Number>() {
         @Override public void changed(ObservableValue<? extends Number> ob, Number oldAngle, Number newAngle) {
-            setXRotation(normalizeAngle(newAngle.doubleValue()));
+            setXRotation(Util.normalizeAngle(newAngle.doubleValue()));
         }
     };
     
@@ -231,18 +224,10 @@ public final class TurntableCameraRig extends Group implements CameraRig {
             PerspectiveCamera pCamera = (PerspectiveCamera)getCamera();
             double width = subscene.getWidth();
             double height = subscene.getHeight();
-            double fov;
-            if (pCamera.isVerticalFieldOfView()) {
-                double fovrad = pCamera.getFieldOfView() * Math.PI / 180.0;
-                double hfovrad = 2.0 * Math.atan((width / height) * Math.tan(fovrad / 2.0));
-                fov = hfovrad * 180.0 / Math.PI;
-            } else {
-                fov = pCamera.getFieldOfView();
-            }
-            hfov.set(fov);
+            hfov.set(Util.getHorizontalFieldOfView(pCamera, width, height));
             TurntableCameraRig.this.width.set(width);
             viewTransform.set(new MyCameraTo2DTransform(getOriginX(), getOriginY(), getOriginZ(),
-                    getXRotation(), getZRotation(), getDistanceFromOrigin(), fov, width, height));
+                    getXRotation(), getZRotation(), getDistanceFromOrigin(), hfov.get(), width, height));
             
             Affine roc = new Affine();
             roc.appendRotation(getZRotation(), 0, 0, 0, 0, 0, 1);
