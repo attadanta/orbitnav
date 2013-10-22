@@ -1,5 +1,7 @@
 package org.arcball.internal;
 
+import org.arcball.NavigationBehavior;
+
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -38,6 +40,8 @@ public final class InteractionDragPan extends InteractionDrag {
                           ReadOnlyObjectProperty<Transform> viewRotation, ReadOnlyDoubleProperty distanceFromOrigin,
                           ReadOnlyObjectProperty<PerspectiveCamera> camera)
     {
+        super();
+        
         // bind basic properties
         this.originX.bindBidirectional(originX);
         this.originY.bindBidirectional(originY);
@@ -46,8 +50,8 @@ public final class InteractionDragPan extends InteractionDrag {
         this.distanceFromOrigin.bind(distanceFromOrigin);
         this.camera.bind(camera);
         
-        // set the default trigger button
-        setTriggerButton(DEFAULT_TRIGGER_BUTTON);
+        // set the default interaction behavior
+        setNavigationBehavior(NavigationBehavior.drag(MouseButton.SECONDARY, NavigationBehavior.Response.PAN));
         
         // listen for changes to the camera (to update the pan scale coefficient)
         final ChangeListener<PerspectiveCamera> cameraChangeListener = new ChangeListener<PerspectiveCamera>() {
@@ -101,7 +105,6 @@ public final class InteractionDragPan extends InteractionDrag {
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
-    private final static MouseButton DEFAULT_TRIGGER_BUTTON = MouseButton.SECONDARY;
     private final static Point3D STARTING_X_VEC = new Point3D(1, 0, 0);
     private final static Point3D STARTING_Y_VEC = new Point3D(0, 1, 0);
 

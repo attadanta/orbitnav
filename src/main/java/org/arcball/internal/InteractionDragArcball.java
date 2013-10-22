@@ -1,5 +1,7 @@
 package org.arcball.internal;
 
+import org.arcball.NavigationBehavior;
+
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
@@ -32,7 +34,7 @@ public final class InteractionDragArcball extends InteractionDrag {
         widthProperty().addListener(whChangeListener);
         heightProperty().addListener(whChangeListener);
         
-        setTriggerButton(DEFAULT_TRIGGER_BUTTON);
+        setNavigationBehavior(NavigationBehavior.drag(MouseButton.PRIMARY, NavigationBehavior.Response.ROTATE));        
     }
 
     //------------------------------------------------------------------------------------------------------- PROTECTED
@@ -66,8 +68,6 @@ public final class InteractionDragArcball extends InteractionDrag {
     }    
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
-    
-    private static final MouseButton DEFAULT_TRIGGER_BUTTON = MouseButton.PRIMARY;
     
     private final DoubleProperty rotationAxisX = new SimpleDoubleProperty(this, "rotationAxisX", 0);
     private final DoubleProperty rotationAxisY = new SimpleDoubleProperty(this, "rotationAxisY", 0);

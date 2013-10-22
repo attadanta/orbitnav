@@ -116,11 +116,7 @@ public final class TurntableCameraRig implements CameraRig {
     public DoubleProperty xRotationProperty() { return xRotation; }
     
     public DoubleProperty distanceFromOriginProperty() { return distanceFromOrigin; }
-    
-    public ObjectProperty<MouseButton> mouseButtonPanProperty() { return pan.triggerButtonProperty(); }
-    
-    public ObjectProperty<MouseButton> mouseButtonRotateProperty() { return turntable.triggerButtonProperty(); }
-    
+        
     public DoubleProperty rotationCoefficientProperty() { return turntable.rotationCoefficientProperty(); }
     
     public DoubleProperty zoomCoefficientProperty() { return zoom.zoomCoefficientProperty(); }

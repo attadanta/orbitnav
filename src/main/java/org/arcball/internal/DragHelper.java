@@ -1,9 +1,12 @@
 package org.arcball.internal;
 
+import org.arcball.NavigationBehavior;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -22,12 +25,21 @@ public final class DragHelper implements Attachable {
 
     /**
      * Creates a new instance of a <code>DragHelper</code>.
-     * @param triggerButton the mouse button required to trigger the drag
+     * @param navigationBehavior the navigation behavior required to initiate the drag
      * @param dragHandler the handler attached to this helper
      */
-    public DragHelper(ObjectProperty<MouseButton> triggerButton, DragHandler dragHandler) {
-        this.triggerButton.bind(triggerButton);
-        this.dragHandler = dragHandler;
+    public DragHelper(ObjectProperty<NavigationBehavior> navigationBehavior, DragHandler dragHandler) {
+        // it only makes sense for DRAG navigation behavior to be assigned; so assert() that
+        this.navigationBehavior.addListener(new ChangeListener<NavigationBehavior>() {
+            @Override public void changed(ObservableValue<? extends NavigationBehavior> ob, 
+                    NavigationBehavior oldnb, NavigationBehavior newnb)
+            {
+                assert(newnb.getInput() == NavigationBehavior.Input.DRAG);
+            }
+        });        
+        
+        this.navigationBehavior.bind(navigationBehavior);
+        this.dragHandler = dragHandler;        
     }
 
     /**
@@ -55,27 +67,27 @@ public final class DragHelper implements Attachable {
     }
     
     /**
-     * Sets the button which will trigger the drags that are monitored by this helper.
-     * @param b triggering mouse button
+     * Sets the navigation behavior.
+     * @param nb navigation behavior
      */
-    public void setTriggerButton(MouseButton b) { triggerButton.set(b); }
+    public void setNavigationBehavior(NavigationBehavior nb) { navigationBehavior.set(nb); }
+
+    /**
+     * Gets the navigation behavior.
+     * @return navigation behavior
+     */
+    public NavigationBehavior getNavigationBehavior() { return navigationBehavior.get(); }
     
     /**
-     * Gets the button which triggers the drags that are monitored by this helper.
-     * @return triggering mouse button
+     * Returns the navigation behavior property.
+     * @return navigation behavior property
      */
-    public MouseButton getTriggerButton() { return triggerButton.get(); }
-    
-    /**
-     * Returns the trigger button property.
-     * @return trigger button property
-     */
-    public ObjectProperty<MouseButton> triggerButtonProperty() { return triggerButton; }
+    public ObjectProperty<NavigationBehavior> navigationBehaviorProperty() { return navigationBehavior; }
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
-    private ObjectProperty<MouseButton> triggerButton = 
-            new SimpleObjectProperty<MouseButton>(this, "triggerButton", MouseButton.PRIMARY);
+    private ObjectProperty<NavigationBehavior> navigationBehavior = 
+            new SimpleObjectProperty<NavigationBehavior>(this, "navigationBehavior", null);
     private final DragHandler dragHandler;
     private double x;
     private double y;
@@ -83,7 +95,8 @@ public final class DragHelper implements Attachable {
     
     private final EventHandler<MouseEvent> mousePressHandler = new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent me) {
-            if (me.getButton() == triggerButton.get()) {
+            final NavigationBehavior nb = navigationBehavior.get();
+            if ((nb == null) || (nb.mouseEventMatches(me))) {
                 x = me.getSceneX();
                 y = me.getSceneY();
                 dragHandler.handleClick(me);
@@ -93,7 +106,8 @@ public final class DragHelper implements Attachable {
     
     private final EventHandler<MouseEvent> mouseDragHandler = new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent me) {
-            if (me.getButton() == triggerButton.get()) {
+            final NavigationBehavior nb = navigationBehavior.get();
+            if ((nb == null) || (nb.mouseEventMatches(me))) {
                 final double oldX = x;
                 final double oldY = y;
                 x = me.getSceneX();
@@ -102,5 +116,5 @@ public final class DragHelper implements Attachable {
             }
         }
     };
-        
+    
 }

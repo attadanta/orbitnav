@@ -1,5 +1,7 @@
 package org.arcball.internal;
 
+import org.arcball.NavigationBehavior;
+
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.input.MouseButton;
@@ -16,7 +18,7 @@ public class InteractionDragZoom extends InteractionDrag {
     
     public InteractionDragZoom(DoubleProperty distanceFromOrigin) {
         this.distanceFromOrigin.bindBidirectional(distanceFromOrigin);
-        setTriggerButton(DEFAULT_TRIGGER_BUTTON);
+        setNavigationBehavior(NavigationBehavior.drag(MouseButton.MIDDLE, NavigationBehavior.Response.ZOOM));
     }
     
     public DoubleProperty distanceFromOriginProperty() { return distanceFromOrigin; }
@@ -36,8 +38,6 @@ public class InteractionDragZoom extends InteractionDrag {
         
     //--------------------------------------------------------------------------------------------------------- PRIVATE
 
-    private final static MouseButton DEFAULT_TRIGGER_BUTTON = MouseButton.MIDDLE;
-    
     private final DoubleProperty distanceFromOrigin = new SimpleDoubleProperty(this, "distanceFromOrigin", 0);
     private final DoubleProperty zoomCoefficient = new SimpleDoubleProperty(this, "zoomCoefficient", 0.003);
     
