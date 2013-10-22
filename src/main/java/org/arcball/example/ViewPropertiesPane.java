@@ -1,6 +1,11 @@
 package org.arcball.example;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.HPos;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -16,12 +21,15 @@ public final class ViewPropertiesPane extends Pane {
         init();
     }
     
-    public void addDoubleProperty(String name, DoubleProperty p) {
+    public void addDoubleProperty(String name, ReadOnlyDoubleProperty p) {
+        DoubleProperty localProperty = new SimpleDoubleProperty(this, p.getName(), 0);
+        localProperty.bind(p);
+        
         Text nameText = new Text(name);
         GridPane.setHalignment(nameText, HPos.RIGHT);
         Text propText = new Text();
         GridPane.setHalignment(propText, HPos.RIGHT);
-        propText.textProperty().bindBidirectional(p, new NumberStringConverter("##0.0"));
+        propText.textProperty().bindBidirectional(localProperty, new NumberStringConverter("##0.0"));
         
         gridPane.addRow(lastRow, nameText, propText);
         lastRow += 1;

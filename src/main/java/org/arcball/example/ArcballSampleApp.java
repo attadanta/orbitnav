@@ -3,6 +3,7 @@ package org.arcball.example;
 import java.io.File;
 import java.util.List;
 
+import org.arcball.ArcballCameraRig;
 import org.arcball.CameraRig;
 import org.arcball.CameraToRasterTransform;
 import org.arcball.Pane3D;
@@ -174,6 +175,15 @@ public final class ArcballSampleApp extends Application {
             viewPropertiesPane.addDoubleProperty("zRotation", tcr.zRotationProperty());
             viewPropertiesPane.addDoubleProperty("xRotation", tcr.xRotationProperty());
             viewPropertiesPane.addDoubleProperty("distanceFromOrigin", tcr.distanceFromOriginProperty());
+        } else if (cameraRig instanceof ArcballCameraRig) {
+            ArcballCameraRig acr = (ArcballCameraRig)cameraRig;
+            viewPropertiesPane.addDoubleProperty("originX", acr.originXProperty());
+            viewPropertiesPane.addDoubleProperty("originY", acr.originYProperty());
+            viewPropertiesPane.addDoubleProperty("originZ", acr.originZProperty());
+            viewPropertiesPane.addDoubleProperty("rotationAxisX", acr.rotationAxisXProperty());
+            viewPropertiesPane.addDoubleProperty("rotationAxisY", acr.rotationAxisYProperty());
+            viewPropertiesPane.addDoubleProperty("rotationAxisZ", acr.rotationAxisZProperty());
+            viewPropertiesPane.addDoubleProperty("rotationAngle", acr.rotationAngleProperty());
         }
     }
 
