@@ -6,6 +6,9 @@ import org.arcball.internal.InteractionScrollZoom;
 import org.arcball.internal.NoGarbageProperty;
 import org.arcball.internal.PerspectiveSceneToRaster;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -20,6 +23,7 @@ import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
+import javafx.util.Duration;
 
 public final class ArcballCameraRig implements CameraRig {
 
@@ -66,7 +70,32 @@ public final class ArcballCameraRig implements CameraRig {
     }
 
     @Override public void encompassBounds(Bounds bounds, double animationDurationMillis) {
-        // TODO Auto-generated method stub
+        // find the center of the bounds
+        double cx = (bounds.getMinX() + bounds.getMaxX()) / 2.0;
+        double cy = (bounds.getMinY() + bounds.getMaxY()) / 2.0;
+        double cz = (bounds.getMinZ() + bounds.getMaxZ()) / 2.0;
+        // find the "radius", as the maximum of the depth, height and width divided by 2
+        double r = Math.max(bounds.getDepth(), Math.max(bounds.getHeight(), bounds.getWidth())) / 2.0;
+        // configure camera
+        if (camera.get() instanceof PerspectiveCamera) {
+          PerspectiveCamera pCamera = (PerspectiveCamera)camera.get();
+          double fov = pCamera.getFieldOfView() * Math.PI / 180.0;
+          double d = r / Math.tan(fov / 2.0);
+          if (animationDurationMillis <= 0.0) {
+              distanceFromOrigin.set(1.1 * d);
+              setOrigin(cx, cy, cz);
+          } else {
+              Duration tf = Duration.millis(animationDurationMillis);
+              Timeline timeline = new Timeline();
+              timeline.getKeyFrames().add(new KeyFrame(tf, new KeyValue(distanceFromOriginProperty(), 1.1 * d)));
+              timeline.getKeyFrames().add(new KeyFrame(tf, new KeyValue(originXProperty(), cx)));
+              timeline.getKeyFrames().add(new KeyFrame(tf, new KeyValue(originYProperty(), cy)));
+              timeline.getKeyFrames().add(new KeyFrame(tf, new KeyValue(originZProperty(), cz)));
+              timeline.play();
+          }
+          pCamera.setNearClip(0.05 * d);
+          pCamera.setFarClip(10.0 * d);
+        }
     }
 
     @Override public ReadOnlyObjectProperty<PerspectiveCamera> cameraProperty() { return camera; }
@@ -83,6 +112,12 @@ public final class ArcballCameraRig implements CameraRig {
         return transformRotationTranslation;
     }
 
+    public void setOrigin(double x, double y, double z) {
+        originX.set(x);
+        originY.set(y);
+        originZ.set(z);
+    }
+    
     public DoubleProperty originXProperty() { return originX; }
     
     public DoubleProperty originYProperty() { return originY; }
