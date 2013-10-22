@@ -68,9 +68,9 @@ public final class ArcballSampleApp extends Application {
         world.getChildren().add(geometryGroup);
         pane3D.getCameraRig().encompassBounds(geometryGroup.getBoundsInParent(), 0);
         
-        TurntableCameraRig tcr = (TurntableCameraRig)pane3D.getCameraRig();
-        tcr.zRotationProperty().set(140);
-        tcr.xRotationProperty().set(260);
+        //TurntableCameraRig tcr = (TurntableCameraRig)pane3D.getCameraRig();
+        //tcr.zRotationProperty().set(140);
+        //tcr.xRotationProperty().set(260);
         updateViewPropertiesPane();
 
         pane3D.getChildren().add(viewPropertiesPane);

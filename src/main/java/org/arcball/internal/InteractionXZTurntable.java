@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 /**
  * Turntable interaction.
@@ -48,8 +49,8 @@ public final class InteractionXZTurntable {
             new SimpleObjectProperty<MouseButton>(this, "triggerButton", DEFAULT_TRIGGER_BUTTON);
     private final DoubleProperty rotationCoefficient = new SimpleDoubleProperty(this, "rotationCoefficient", 0.4);
     
-    private final DragHelper dragHelper = new DragHelper(triggerButton, new DragHandler() {
-        public void handleDrag(double deltaX, double deltaY) {
+    private final DragHelper dragHelper = new DragHelper(triggerButton, new DragHandlerAdaptor() {
+        @Override public void handleDrag(MouseEvent mouseEvent, double deltaX, double deltaY) {
             final double oldXRot = xRotation.get();
             final double oldZRot = zRotation.get();
             final double coeff = rotationCoefficient.get();

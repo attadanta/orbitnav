@@ -13,6 +13,7 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 
@@ -140,8 +141,8 @@ public final class InteractionPan {
         }
     }
     
-    private final DragHelper dragHelper = new DragHelper(triggerButton, new DragHandler() {
-        public void handleDrag(double deltaX, double deltaY) {
+    private final DragHelper dragHelper = new DragHelper(triggerButton, new DragHandlerAdaptor() {
+        @Override public void handleDrag(MouseEvent me, double deltaX, double deltaY) {
             updateCoeff();
             // find local x and y vector shifts for the camera
             final Point3D dxVec = viewRotation.get().transform(STARTING_X_VEC).multiply(coeff * deltaX);

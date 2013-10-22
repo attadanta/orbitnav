@@ -61,7 +61,8 @@ public final class Pane3D extends Pane {
         widthProperty().addListener(widthChangeListener);
         heightProperty().addListener(heightChangeListener);
         cameraRigProperty().addListener(rigChangeListener);
-        setCameraRig(new TurntableCameraRig());
+        //setCameraRig(new TurntableCameraRig());
+        setCameraRig(new ArcballCameraRig());
         
         PerspectiveCamera axisCamera = new PerspectiveCamera(true);
         axisCamera.setTranslateZ(-5);

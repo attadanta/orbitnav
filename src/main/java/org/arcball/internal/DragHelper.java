@@ -111,6 +111,7 @@ public final class DragHelper {
             if (me.getButton() == triggerButton.get()) {
                 x = me.getSceneX();
                 y = me.getSceneY();
+                dragHandler.handleClick(me);
             }
         }
     };
@@ -122,7 +123,7 @@ public final class DragHelper {
                 final double oldY = y;
                 x = me.getSceneX();
                 y = me.getSceneY();
-                dragHandler.handleDrag(x - oldX, y - oldY);
+                dragHandler.handleDrag(me, x - oldX, y - oldY);
             }
         }
     };

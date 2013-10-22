@@ -140,9 +140,6 @@ public final class TurntableCameraRig implements CameraRig {
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
-    private Scene scene = null;
-    private SubScene subscene = null;
-    
     private final DoubleProperty originX            = new SimpleDoubleProperty(this, "originX", 0);
     private final DoubleProperty originY            = new SimpleDoubleProperty(this, "originY", 0);
     private final DoubleProperty originZ            = new SimpleDoubleProperty(this, "originZ", 0);
@@ -164,6 +161,9 @@ public final class TurntableCameraRig implements CameraRig {
     private final InteractionScrollZoom  zoom      = new InteractionScrollZoom(distanceFromOrigin);
     private final InteractionPan         pan       = new InteractionPan(originX, originY, originZ, 
             transformRotationOnly, distanceFromOrigin, camera);
+
+    private Scene scene = null;
+    private SubScene subscene = null;    
     
     private void updateTransformRotationOnly() {
         final Affine xform = (Affine)transformRotationOnly.get();
@@ -199,7 +199,7 @@ public final class TurntableCameraRig implements CameraRig {
         camera.get().getTransforms().setAll(transformRotationTranslation.get());
     }
     
-    public void buildListeners() {
+    private void buildListeners() {
         final ChangeListener<Number> triggerUpdateTransformsFromNumber = new ChangeListener<Number>() {
             @Override public void changed(ObservableValue<? extends Number> ob, Number oldValue, Number newValue) {
                 updateTransforms();
