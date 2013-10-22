@@ -140,7 +140,7 @@ public final class InteractionPan {
         }
     }
     
-    private final DragHandler dragHandler = new DragHandler() {
+    private final DragHelper dragHelper = new DragHelper(triggerButton, new DragHandler() {
         public void handleDrag(double deltaX, double deltaY) {
             updateCoeff();
             // find local x and y vector shifts for the camera
@@ -150,9 +150,7 @@ public final class InteractionPan {
             originX.set(originX.get() - dxVec.getX() - dyVec.getX());
             originY.set(originY.get() - dxVec.getY() - dyVec.getY());
             originZ.set(originZ.get() - dxVec.getZ() - dyVec.getZ());
-        }
-    };
-
-    private final DragHelper dragHelper = new DragHelper(triggerButton, dragHandler);
+        }        
+    });
         
 }
