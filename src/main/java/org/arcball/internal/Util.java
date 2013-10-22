@@ -17,12 +17,13 @@ public final class Util {
      * @return horizontal field of view (degrees)
      */
     public static double getHorizontalFieldOfView(PerspectiveCamera camera, double width, double height) {
+        final double camFovDegrees = camera.getFieldOfView();
         if (camera.isVerticalFieldOfView()) {
-            final double fovRad = Math.toRadians(camera.getFieldOfView());
+            final double fovRad = Math.toRadians(camFovDegrees);
             final double hFovRad = 2.0 * Math.atan((width / height) * Math.tan(fovRad / 2.0));
             return Math.toDegrees(hFovRad);
         } else {
-            return camera.getFieldOfView();
+            return camFovDegrees;
         }
     }
     
