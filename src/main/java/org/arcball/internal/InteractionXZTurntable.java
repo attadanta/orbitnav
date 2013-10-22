@@ -48,7 +48,7 @@ public final class InteractionXZTurntable {
             new SimpleObjectProperty<MouseButton>(this, "triggerButton", DEFAULT_TRIGGER_BUTTON);
     private final DoubleProperty rotationCoefficient = new SimpleDoubleProperty(this, "rotationCoefficient", 0.4);
     
-    private final DragHandler dragHandler = new DragHandler() {
+    private final DragHelper dragHelper = new DragHelper(triggerButton, new DragHandler() {
         public void handleDrag(double deltaX, double deltaY) {
             final double oldXRot = xRotation.get();
             final double oldZRot = zRotation.get();
@@ -58,9 +58,7 @@ public final class InteractionXZTurntable {
             final double newZRotation = oldZRot - (zRotationSign * coeff * deltaX); 
             xRotation.set(Util.normalizeAngle(newXRotation));
             zRotation.set(Util.normalizeAngle(newZRotation));
-        }
-    };
-    
-    private final DragHelper dragHelper = new DragHelper(triggerButton, dragHandler);
+        }        
+    });
     
 }
