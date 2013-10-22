@@ -1,7 +1,7 @@
 package org.arcball;
 
-import org.arcball.internal.InteractionArcball;
-import org.arcball.internal.InteractionPan;
+import org.arcball.internal.InteractionDragArcball;
+import org.arcball.internal.InteractionDragPan;
 import org.arcball.internal.InteractionScrollZoom;
 import org.arcball.internal.NoGarbageProperty;
 import org.arcball.internal.PerspectiveSceneToRaster;
@@ -155,10 +155,10 @@ public final class ArcballCameraRig implements CameraRig {
             new NoGarbageProperty<CameraToRasterTransform>(this, "transformSceneToRaster",
                     new PerspectiveSceneToRaster());
     
-    private final InteractionArcball arcball = new InteractionArcball(rotationAngle,
+    private final InteractionDragArcball arcball = new InteractionDragArcball(rotationAngle,
             rotationAxisX, rotationAxisY, rotationAxisZ);
     private final InteractionScrollZoom zoom = new InteractionScrollZoom(distanceFromOrigin);
-    private final InteractionPan pan = new InteractionPan(originX, originY, originZ, transformRotationOnly,
+    private final InteractionDragPan pan = new InteractionDragPan(originX, originY, originZ, transformRotationOnly,
             distanceFromOrigin, camera);
     
     private Scene scene = null;

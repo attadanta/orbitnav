@@ -14,11 +14,11 @@ import javafx.scene.input.MouseEvent;
  *
  * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
  */
-public final class InteractionXZTurntable {
+public final class InteractionDragXZTurntable {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
     
-    public InteractionXZTurntable(DoubleProperty xRotation, DoubleProperty zRotation) {
+    public InteractionDragXZTurntable(DoubleProperty xRotation, DoubleProperty zRotation) {
         this.xRotation.bindBidirectional(xRotation);
         this.zRotation.bindBidirectional(zRotation);
     }

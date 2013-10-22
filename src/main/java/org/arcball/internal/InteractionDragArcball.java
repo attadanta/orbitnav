@@ -16,11 +16,11 @@ import javafx.scene.input.MouseEvent;
  *
  * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
  */
-public final class InteractionArcball {
+public final class InteractionDragArcball {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
     
-    public InteractionArcball(DoubleProperty rotationAngle,
+    public InteractionDragArcball(DoubleProperty rotationAngle,
             DoubleProperty rotationAxisX, DoubleProperty rotationAxisY, DoubleProperty rotationAxisZ)
     {
         this.rotationAngle.bindBidirectional(rotationAngle);

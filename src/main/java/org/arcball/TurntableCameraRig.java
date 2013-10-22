@@ -1,8 +1,8 @@
 package org.arcball;
 
-import org.arcball.internal.InteractionXZTurntable;
+import org.arcball.internal.InteractionDragXZTurntable;
 import org.arcball.internal.InteractionScrollZoom;
-import org.arcball.internal.InteractionPan;
+import org.arcball.internal.InteractionDragPan;
 import org.arcball.internal.NoGarbageProperty;
 import org.arcball.internal.PerspectiveSceneToRaster;
 
@@ -157,9 +157,9 @@ public final class TurntableCameraRig implements CameraRig {
             new NoGarbageProperty<CameraToRasterTransform>(this, "transformSceneToRaster",
                     new PerspectiveSceneToRaster());
     
-    private final InteractionXZTurntable turntable = new InteractionXZTurntable(xRotation, zRotation);
+    private final InteractionDragXZTurntable turntable = new InteractionDragXZTurntable(xRotation, zRotation);
     private final InteractionScrollZoom  zoom      = new InteractionScrollZoom(distanceFromOrigin);
-    private final InteractionPan         pan       = new InteractionPan(originX, originY, originZ, 
+    private final InteractionDragPan         pan       = new InteractionDragPan(originX, originY, originZ, 
             transformRotationOnly, distanceFromOrigin, camera);
 
     private Scene scene = null;

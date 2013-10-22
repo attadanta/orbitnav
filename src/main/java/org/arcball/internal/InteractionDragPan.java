@@ -22,7 +22,7 @@ import javafx.scene.transform.Transform;
  * 
  * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
  */
-public final class InteractionPan {
+public final class InteractionDragPan {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
     
@@ -36,7 +36,7 @@ public final class InteractionPan {
      * @param distanceFromOrigin distance from origin
      * @param camera camera property
      */
-    public InteractionPan(DoubleProperty originX, DoubleProperty originY, DoubleProperty originZ,
+    public InteractionDragPan(DoubleProperty originX, DoubleProperty originY, DoubleProperty originZ,
                           ReadOnlyObjectProperty<Transform> viewRotation, ReadOnlyDoubleProperty distanceFromOrigin,
                           ReadOnlyObjectProperty<PerspectiveCamera> camera)
     {
