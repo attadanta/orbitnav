@@ -16,7 +16,7 @@ import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 
 /**
- * Panning interaction.
+ * Panning drag interaction.
  * 
  * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
  */

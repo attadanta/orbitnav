@@ -2,6 +2,7 @@ package org.arcball;
 
 import org.arcball.internal.InteractionDragArcball;
 import org.arcball.internal.InteractionDragPan;
+import org.arcball.internal.InteractionDragZoom;
 import org.arcball.internal.InteractionScrollZoom;
 import org.arcball.internal.NoGarbageProperty;
 import org.arcball.internal.PerspectiveSceneToRaster;
@@ -37,14 +38,16 @@ public final class ArcballCameraRig implements CameraRig {
         assert((this.scene == null) && (this.subscene == null));
         this.scene = scene;
         scene.setCamera(camera.get());
-        zoom.attachToScene(scene);
+        scrollZoom.attachToScene(scene);
+        dragZoom.attachToScene(scene);
         pan.attachToScene(scene);
         arcball.attachToScene(scene);
     }
 
     @Override public void detachFromScene(Scene scene) {
         assert((this.scene == scene) && (this.subscene == null));
-        zoom.detachFromScene(scene);
+        scrollZoom.detachFromScene(scene);
+        dragZoom.detachFromScene(scene);
         pan.detachFromScene(scene);
         arcball.detachFromScene(scene);
         scene.setCamera(null);
@@ -55,14 +58,16 @@ public final class ArcballCameraRig implements CameraRig {
         assert((this.scene == null) && (this.subscene == null));
         this.subscene = subscene;
         subscene.setCamera(camera.get());
-        zoom.attachToSubScene(subscene);
+        scrollZoom.attachToSubScene(subscene);
+        dragZoom.attachToSubScene(subscene);
         pan.attachToSubScene(subscene);
         arcball.attachToSubScene(subscene);
     }
 
     @Override public void detachFromSubScene(SubScene subscene) {
         assert((this.scene == null) && (this.subscene == subscene));
-        zoom.detachFromSubScene(subscene);
+        scrollZoom.detachFromSubScene(subscene);
+        dragZoom.detachFromSubScene(subscene);
         pan.detachFromSubScene(subscene);
         arcball.detachFromSubScene(subscene);
         subscene.setCamera(null);
@@ -157,7 +162,8 @@ public final class ArcballCameraRig implements CameraRig {
     
     private final InteractionDragArcball arcball = new InteractionDragArcball(rotationAngle,
             rotationAxisX, rotationAxisY, rotationAxisZ);
-    private final InteractionScrollZoom zoom = new InteractionScrollZoom(distanceFromOrigin);
+    private final InteractionScrollZoom scrollZoom = new InteractionScrollZoom(distanceFromOrigin);
+    private final InteractionDragZoom dragZoom = new InteractionDragZoom(distanceFromOrigin);
     private final InteractionDragPan pan = new InteractionDragPan(originX, originY, originZ, transformRotationOnly,
             distanceFromOrigin, camera);
     
