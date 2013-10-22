@@ -3,8 +3,6 @@ package org.arcball.internal;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.SubScene;
 import javafx.scene.input.ScrollEvent;
 
 /**
@@ -12,7 +10,7 @@ import javafx.scene.input.ScrollEvent;
  * 
  * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
  */
-public final class InteractionScrollZoom {
+public final class InteractionScrollZoom implements Attachable {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
     
@@ -20,13 +18,13 @@ public final class InteractionScrollZoom {
         this.distanceFromOrigin.bindBidirectional(distanceFromOrigin);
     }
     
-    public void attachToScene(Scene scene) { scene.addEventHandler(ScrollEvent.SCROLL, scrollHandler); }
+    public void attachToHost(InteractionHost host) {
+        host.addEventHandler(ScrollEvent.SCROLL, scrollHandler);
+    }
     
-    public void detachFromScene(Scene scene) { scene.removeEventHandler(ScrollEvent.SCROLL, scrollHandler); }
-
-    public void attachToSubScene(SubScene sscene) { sscene.addEventHandler(ScrollEvent.SCROLL, scrollHandler); }
-    
-    public void detachFromSubScene(SubScene sscene) { sscene.removeEventHandler(ScrollEvent.SCROLL, scrollHandler); }
+    public void detachFromHost(InteractionHost host) {
+        host.removeEventHandler(ScrollEvent.SCROLL, scrollHandler);
+    }
 
     public DoubleProperty distanceFromOriginProperty() { return distanceFromOrigin; }
     

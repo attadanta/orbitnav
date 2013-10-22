@@ -1,6 +1,9 @@
 package org.arcball;
 
 import org.arcball.internal.InteractionDragXZTurntable;
+import org.arcball.internal.InteractionHost;
+import org.arcball.internal.InteractionHostScene;
+import org.arcball.internal.InteractionHostSubScene;
 import org.arcball.internal.InteractionScrollZoom;
 import org.arcball.internal.InteractionDragPan;
 import org.arcball.internal.NoGarbageProperty;
@@ -37,36 +40,32 @@ public final class TurntableCameraRig implements CameraRig {
         assert((this.scene == null) && (this.subscene == null));
         this.scene = scene;
         scene.setCamera(camera.get());
-        turntable.attachToScene(scene);
-        zoom.attachToScene(scene);
-        pan.attachToScene(scene);
+        host = new InteractionHostScene(scene);
+        attachToHost();
     }
     
     public void detachFromScene(Scene scene) {
         assert((this.scene == scene) && (this.subscene == null));
-        turntable.detachFromScene(scene);
-        zoom.detachFromScene(scene);
-        pan.detachFromScene(scene);
+        detachFromHost();
         scene.setCamera(null);
         this.scene = null;
+        this.host = null;
     }
     
     public void attachToSubScene(SubScene subscene) {
         assert((this.scene == null) && (this.subscene == null));
         this.subscene = subscene;
-        turntable.attachToSubScene(subscene);
-        zoom.attachToSubScene(subscene);
-        pan.attachToSubScene(subscene);
+        host = new InteractionHostSubScene(subscene);
+        attachToHost();
         subscene.setCamera(camera.get());
     }
     
     public void detachFromSubScene(SubScene subscene) {
         assert((this.scene == null) && (this.subscene == subscene));
-        turntable.detachFromSubScene(subscene);
-        zoom.detachFromSubScene(subscene);
-        pan.detachFromSubScene(subscene);
+        detachFromHost();
         subscene.setCamera(null);
         this.subscene = null;
+        this.host = null;
     }
     
     public void encompassBounds(Bounds bounds, double animationDurationMillis) {
@@ -163,7 +162,8 @@ public final class TurntableCameraRig implements CameraRig {
             transformRotationOnly, distanceFromOrigin, camera);
 
     private Scene scene = null;
-    private SubScene subscene = null;    
+    private SubScene subscene = null;
+    private InteractionHost host = null;
     
     private void updateTransformRotationOnly() {
         final Affine xform = (Affine)transformRotationOnly.get();
@@ -213,5 +213,18 @@ public final class TurntableCameraRig implements CameraRig {
         distanceFromOrigin.addListener(triggerUpdateTransformsFromNumber);
         camera.get().fieldOfViewProperty().addListener(triggerUpdateTransformsFromNumber);
     }
-        
+    
+    private void attachToHost() {
+        assert(host != null);
+        turntable.attachToHost(host);
+        zoom.attachToHost(host);
+        pan.attachToHost(host);        
+    }
+    
+    private void detachFromHost() {
+        assert(host != null);
+        turntable.detachFromHost(host);
+        zoom.detachFromHost(host);
+        pan.detachFromHost(host);
+    }
 }

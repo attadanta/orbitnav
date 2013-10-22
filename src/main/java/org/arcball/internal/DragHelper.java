@@ -3,8 +3,6 @@ package org.arcball.internal;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.SubScene;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
@@ -18,7 +16,7 @@ import javafx.scene.input.MouseEvent;
  * 
  * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
  */
-public final class DragHelper {
+public final class DragHelper implements Attachable {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
 
@@ -31,51 +29,29 @@ public final class DragHelper {
         this.triggerButton.bind(triggerButton);
         this.dragHandler = dragHandler;
     }
-    
+
     /**
-     * Attaches this drag helper to a scene.
-     * @param scene scene to which the helper should be attached
+     * Attaches to a host to receive mouse events.
+     * 
+     * @param host host to which attachment should be made
      */
-    public void attachToScene(Scene scene) {
-        assert((this.scene == null) && (this.subscene == null));
-        this.scene = scene;
-        scene.addEventHandler(MouseEvent.MOUSE_PRESSED, mousePressHandler);
-        scene.addEventHandler(MouseEvent.MOUSE_DRAGGED, mouseDragHandler);
+    public void attachToHost(InteractionHost host) {
+        assert(this.host == null);
+        this.host = host;
+        host.addEventHandler(MouseEvent.MOUSE_PRESSED, mousePressHandler);
+        host.addEventHandler(MouseEvent.MOUSE_DRAGGED, mouseDragHandler);
     }
-    
+
     /**
-     * Attaches this drag helper to a subscene.
-     * @param subscene subscene to which the helper should be attached
+     * Detaches from a host to stop receving mouse events.
+     * 
+     * @param host host from which to detach
      */
-    public void attachToSubScene(SubScene subscene) {
-        assert((this.scene == null) && (this.subscene == null));
-        this.subscene = subscene;
-        subscene.addEventHandler(MouseEvent.MOUSE_PRESSED, mousePressHandler);
-        subscene.addEventHandler(MouseEvent.MOUSE_DRAGGED, mouseDragHandler);        
-    }
-    
-    /**
-     * Detaches this drag helper from a scene.  The <code>scene</code> must match the scene to which the helper was
-     * previously attached using the {@link #attachToScene(Scene) attachToScene} method.
-     * @param scene scene from which to detach the helper
-     */
-    public void detachFromScene(Scene scene) {
-        assert((this.scene == scene) && (this.subscene == null));
-        scene.removeEventHandler(MouseEvent.MOUSE_PRESSED, mousePressHandler);
-        scene.removeEventHandler(MouseEvent.MOUSE_PRESSED, mouseDragHandler);
-        this.scene = null;
-    }
-    
-    /**
-     * Detaches this drag helper from a subscene.  The <code>subscene</code> must match the subscene to which the
-     * helper was previously attached using the {@link #attachToSubScene(SubScene) attachToSubScene} method.
-     * @param subscene scene from which to detach the helper
-     */
-    public void detachFromSubScene(SubScene subscene) {
-        assert((this.subscene == subscene) && (this.scene == null));
-        subscene.removeEventHandler(MouseEvent.MOUSE_PRESSED, mousePressHandler);
-        subscene.removeEventHandler(MouseEvent.MOUSE_PRESSED, mouseDragHandler);
-        this.subscene = null;
+    public void detachFromHost(InteractionHost host) {
+        assert(this.host == host);
+        host.removeEventHandler(MouseEvent.MOUSE_PRESSED, mousePressHandler);
+        host.removeEventHandler(MouseEvent.MOUSE_DRAGGED, mouseDragHandler);
+        this.host = null;
     }
     
     /**
@@ -103,8 +79,7 @@ public final class DragHelper {
     private final DragHandler dragHandler;
     private double x;
     private double y;
-    private Scene scene = null;
-    private SubScene subscene = null;
+    private InteractionHost host = null;
     
     private final EventHandler<MouseEvent> mousePressHandler = new EventHandler<MouseEvent>() {
         @Override public void handle(MouseEvent me) {

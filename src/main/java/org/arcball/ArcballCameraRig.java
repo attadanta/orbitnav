@@ -3,6 +3,9 @@ package org.arcball;
 import org.arcball.internal.InteractionDragArcball;
 import org.arcball.internal.InteractionDragPan;
 import org.arcball.internal.InteractionDragZoom;
+import org.arcball.internal.InteractionHost;
+import org.arcball.internal.InteractionHostScene;
+import org.arcball.internal.InteractionHostSubScene;
 import org.arcball.internal.InteractionScrollZoom;
 import org.arcball.internal.NoGarbageProperty;
 import org.arcball.internal.PerspectiveSceneToRaster;
@@ -38,40 +41,32 @@ public final class ArcballCameraRig implements CameraRig {
         assert((this.scene == null) && (this.subscene == null));
         this.scene = scene;
         scene.setCamera(camera.get());
-        scrollZoom.attachToScene(scene);
-        dragZoom.attachToScene(scene);
-        pan.attachToScene(scene);
-        arcball.attachToScene(scene);
+        host = new InteractionHostScene(scene);
+        attachToHost();
     }
 
     @Override public void detachFromScene(Scene scene) {
         assert((this.scene == scene) && (this.subscene == null));
-        scrollZoom.detachFromScene(scene);
-        dragZoom.detachFromScene(scene);
-        pan.detachFromScene(scene);
-        arcball.detachFromScene(scene);
+        detachFromHost();
         scene.setCamera(null);
         this.scene = null;
+        this.host = null;
     }
 
     @Override public void attachToSubScene(SubScene subscene) {
         assert((this.scene == null) && (this.subscene == null));
         this.subscene = subscene;
         subscene.setCamera(camera.get());
-        scrollZoom.attachToSubScene(subscene);
-        dragZoom.attachToSubScene(subscene);
-        pan.attachToSubScene(subscene);
-        arcball.attachToSubScene(subscene);
+        host = new InteractionHostSubScene(subscene);
+        attachToHost();
     }
 
     @Override public void detachFromSubScene(SubScene subscene) {
         assert((this.scene == null) && (this.subscene == subscene));
-        scrollZoom.detachFromSubScene(subscene);
-        dragZoom.detachFromSubScene(subscene);
-        pan.detachFromSubScene(subscene);
-        arcball.detachFromSubScene(subscene);
+        detachFromHost();
         subscene.setCamera(null);
         this.subscene = null;
+        this.host = null;
     }
 
     @Override public void encompassBounds(Bounds bounds, double animationDurationMillis) {
@@ -167,6 +162,7 @@ public final class ArcballCameraRig implements CameraRig {
     private final InteractionDragPan pan = new InteractionDragPan(originX, originY, originZ, transformRotationOnly,
             distanceFromOrigin, camera);
     
+    private InteractionHost host = null;
     private Scene scene = null;
     private SubScene subscene = null;
     
@@ -218,6 +214,22 @@ public final class ArcballCameraRig implements CameraRig {
         rotationAxisZ.addListener(triggerUpdateTransformsFromNumber);
         rotationAngle.addListener(triggerUpdateTransformsFromNumber);
         distanceFromOrigin.addListener(triggerUpdateTransformsFromNumber);
+    }
+    
+    private void attachToHost() {
+        assert(host != null);
+        scrollZoom.attachToHost(host);
+        dragZoom.attachToHost(host);
+        pan.attachToHost(host);
+        arcball.attachToHost(host);        
+    }
+    
+    private void detachFromHost() {
+        assert(host != null);
+        scrollZoom.detachFromHost(host);
+        dragZoom.detachFromHost(host);
+        pan.detachFromHost(host);
+        arcball.detachFromHost(host);        
     }
     
 }

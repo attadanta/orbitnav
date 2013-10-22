@@ -14,30 +14,18 @@ import javafx.scene.input.MouseButton;
  * 
  * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
  */
-public abstract class InteractionDrag {
+public abstract class InteractionDrag implements Attachable {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
     
-    public void attachToScene(Scene scene) { 
-        dragHelper.attachToScene(scene); 
-        width.bind(scene.widthProperty());
-        height.bind(scene.heightProperty());
+    public void attachToHost(InteractionHost host) {
+        dragHelper.attachToHost(host);
+        width.bind(host.widthProperty());
+        height.bind(host.heightProperty());
     }
     
-    public void attachToSubScene(SubScene subscene) { 
-        dragHelper.attachToSubScene(subscene);
-        width.bind(subscene.widthProperty());
-        height.bind(subscene.heightProperty());
-    }
-    
-    public void detachFromScene(Scene scene) { 
-        dragHelper.detachFromScene(scene);
-        width.unbind();
-        height.unbind();
-    }
-    
-    public void detachFromSubScene(SubScene subscene) { 
-        dragHelper.detachFromSubScene(subscene);
+    public void detachFromHost(InteractionHost host) {
+        dragHelper.detachFromHost(host);
         width.unbind();
         height.unbind();
     }
