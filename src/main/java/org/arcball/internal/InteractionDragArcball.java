@@ -1,13 +1,9 @@
 package org.arcball.internal;
 
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.Scene;
-import javafx.scene.SubScene;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
@@ -16,7 +12,7 @@ import javafx.scene.input.MouseEvent;
  *
  * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
  */
-public final class InteractionDragArcball {
+public final class InteractionDragArcball extends InteractionDrag {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
     
@@ -33,35 +29,41 @@ public final class InteractionDragArcball {
                 updateArcballCenterAndRadius();
             }
         };
-        width.addListener(whChangeListener);
-        height.addListener(whChangeListener);
+        widthProperty().addListener(whChangeListener);
+        heightProperty().addListener(whChangeListener);
+        
+        setTriggerButton(DEFAULT_TRIGGER_BUTTON);
     }
-    
-    public void attachToScene(Scene scene) {
-        dragHelper.attachToScene(scene);
-        width.bind(scene.widthProperty());
-        height.bind(scene.heightProperty());
-    }
-    
-    public void attachToSubScene(SubScene subscene) {
-        dragHelper.attachToSubScene(subscene);
-        width.bind(subscene.widthProperty());
-        height.bind(subscene.heightProperty());
-    }
-    
-    public void detachFromScene(Scene scene) {
-        dragHelper.detachFromScene(scene);
-        width.unbind();
-        height.unbind();
-    }
-    
-    public void detachFromSubScene(SubScene subscene) {
-        dragHelper.detachFromSubScene(subscene);
-        width.unbind();
-        height.unbind();
-    }
-    
-    public ObjectProperty<MouseButton> triggerButtonProperty() { return triggerButton; }
+
+    //------------------------------------------------------------------------------------------------------- PROTECTED
+
+    protected DragHandler getDragHandler() {
+        return new DragHandlerAdaptor() {
+            @Override public void handleClick(MouseEvent me) {
+                projectScenePointToSphere(startArcballVector, me.getSceneX(), me.getSceneY());
+                startQuat.setAxisAngle(rotationAxisX.get(), rotationAxisY.get(), rotationAxisZ.get(), 
+                                       rotationAngle.get());
+            }
+            @Override public void handleDrag(MouseEvent me, double deltaX, double deltaY) {
+                projectScenePointToSphere(currentArcballVector, me.getSceneX(), me.getSceneY());
+                // find the quaternion rotation between the initial arcball vector and the current arcball vector
+                rotationAxis.setToCross(startArcballVector, currentArcballVector);
+                final double angleRadians = -Math.acos(Math.min(1.0, startArcballVector.dot(currentArcballVector)));
+                deltaQuat.setAxisAngle(rotationAxis, Math.toDegrees(angleRadians));
+                // set the current rotation
+                if (angleRadians != 0) {
+                    finalQuat.set(startQuat);
+                    finalQuat.multiplyBy(deltaQuat);
+                    finalQuat.normalize();
+                    finalQuat.getAxis(rotationAxis);
+                    rotationAxisX.set(rotationAxis.x);
+                    rotationAxisY.set(rotationAxis.y);
+                    rotationAxisZ.set(rotationAxis.z);
+                    rotationAngle.set(Util.normalizeAngle(finalQuat.getAngleDegrees()));
+                }
+            }
+        };
+    }    
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
@@ -71,11 +73,7 @@ public final class InteractionDragArcball {
     private final DoubleProperty rotationAxisY = new SimpleDoubleProperty(this, "rotationAxisY", 0);
     private final DoubleProperty rotationAxisZ = new SimpleDoubleProperty(this, "rotationAxisZ", 0);
     private final DoubleProperty rotationAngle = new SimpleDoubleProperty(this, "rotationAngle", 0);
-    private final ObjectProperty<MouseButton> triggerButton =
-            new SimpleObjectProperty<MouseButton>(this, "triggerButton", DEFAULT_TRIGGER_BUTTON);
 
-    private final DoubleProperty width = new SimpleDoubleProperty(this, "width", 1.0);
-    private final DoubleProperty height = new SimpleDoubleProperty(this, "height", 1.0);
     private double centerX;  // centerX = width / 2
     private double centerY;  // centerY = height / 2
     private double radius;   // radius = max(width, height) / 3
@@ -86,36 +84,11 @@ public final class InteractionDragArcball {
     private final MutableVec startArcballVector = new MutableVec();    
     private final MutableVec currentArcballVector = new MutableVec();
     private final MutableVec rotationAxis = new MutableVec();
-
-    private final DragHelper dragHelper = new DragHelper(triggerButton, new DragHandlerAdaptor() {
-        @Override public void handleClick(MouseEvent me) {
-            projectScenePointToSphere(startArcballVector, me.getSceneX(), me.getSceneY());
-            startQuat.setAxisAngle(rotationAxisX.get(), rotationAxisY.get(), rotationAxisZ.get(), rotationAngle.get());
-        }
-        @Override public void handleDrag(MouseEvent me, double deltaX, double deltaY) {
-            projectScenePointToSphere(currentArcballVector, me.getSceneX(), me.getSceneY());
-            // find the quaternion rotation between the initial arcball vector and the current arcball vector
-            rotationAxis.setToCross(startArcballVector, currentArcballVector);
-            final double angleRadians = -Math.acos(Math.min(1.0, startArcballVector.dot(currentArcballVector)));
-            deltaQuat.setAxisAngle(rotationAxis, Math.toDegrees(angleRadians));
-            // set the current rotation
-            if (angleRadians != 0) {
-                finalQuat.set(startQuat);
-                finalQuat.multiplyBy(deltaQuat);
-                finalQuat.normalize();
-                finalQuat.getAxis(rotationAxis);
-                rotationAxisX.set(rotationAxis.x);
-                rotationAxisY.set(rotationAxis.y);
-                rotationAxisZ.set(rotationAxis.z);
-                rotationAngle.set(Util.normalizeAngle(finalQuat.getAngleDegrees()));
-            }
-        }
-    });
     
     private void updateArcballCenterAndRadius() {
-        centerX = width.get() / 2.0;
-        centerY = height.get() / 2.0;
-        radius = Math.max(width.get(), height.get()) / 3.0;
+        centerX = getWidth() / 2.0;
+        centerY = getHeight() / 2.0;
+        radius = Math.max(getWidth(), getHeight()) / 3.0;
     }
     
     private void projectScenePointToSphere(MutableVec result, double sceneX, double sceneY) {

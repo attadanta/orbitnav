@@ -10,8 +10,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point3D;
 import javafx.scene.PerspectiveCamera;
-import javafx.scene.Scene;
-import javafx.scene.SubScene;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.transform.Affine;
@@ -22,7 +20,7 @@ import javafx.scene.transform.Transform;
  * 
  * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
  */
-public final class InteractionDragPan {
+public final class InteractionDragPan extends InteractionDrag {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
     
@@ -48,6 +46,9 @@ public final class InteractionDragPan {
         this.distanceFromOrigin.bind(distanceFromOrigin);
         this.camera.bind(camera);
         
+        // set the default trigger button
+        setTriggerButton(DEFAULT_TRIGGER_BUTTON);
+        
         // listen for changes to the camera (to update the pan scale coefficient)
         final ChangeListener<PerspectiveCamera> cameraChangeListener = new ChangeListener<PerspectiveCamera>() {
             @Override public void changed(ObservableValue<? extends PerspectiveCamera> ob, 
@@ -63,38 +64,12 @@ public final class InteractionDragPan {
             }
         };
         // attach listeners to properties that affect the pan scale coefficient
+        widthProperty().addListener(coeffParamListener);
+        heightProperty().addListener(coeffParamListener);
         this.distanceFromOrigin.addListener(coeffParamListener);
-        this.width.addListener(coeffParamListener);
-        this.height.addListener(coeffParamListener);
         this.camera.addListener(cameraChangeListener);
     }
         
-    public void attachToScene(Scene scene) { 
-        dragHelper.attachToScene(scene);
-        width.bind(scene.widthProperty());
-        height.bind(scene.heightProperty());
-    }
-    
-    public void detachFromScene(Scene scene) { 
-        dragHelper.detachFromScene(scene);
-        width.unbind();
-        height.unbind();
-    }
-    
-    public void attachToSubScene(SubScene subscene) {
-        dragHelper.attachToSubScene(subscene);
-        width.bind(subscene.widthProperty());
-        height.bind(subscene.heightProperty());
-    }
-    
-    public void detachFromSubScene(SubScene subscene) { 
-        dragHelper.detachFromSubScene(subscene);
-        width.unbind();
-        height.unbind();
-    }
-        
-    public ObjectProperty<MouseButton> triggerButtonProperty() { return triggerButton; }
-    
     public DoubleProperty originXProperty() { return originX; }
     
     public DoubleProperty originYProperty() { return originY; }
@@ -107,14 +82,29 @@ public final class InteractionDragPan {
     
     public ObjectProperty<PerspectiveCamera> cameraProperty() { return camera; }
     
+    //------------------------------------------------------------------------------------------------------- PROTECTED
+    
+    protected DragHandler getDragHandler() {
+        return new DragHandlerAdaptor() {
+            @Override public void handleDrag(MouseEvent me, double deltaX, double deltaY) {
+                updateCoeff();
+                // find local x and y vector shifts for the camera
+                final Point3D dxVec = viewRotation.get().transform(STARTING_X_VEC).multiply(coeff * deltaX);
+                final Point3D dyVec = viewRotation.get().transform(STARTING_Y_VEC).multiply(coeff * deltaY);
+                // perform shifts along x and y
+                originX.set(originX.get() - dxVec.getX() - dyVec.getX());
+                originY.set(originY.get() - dxVec.getY() - dyVec.getY());
+                originZ.set(originZ.get() - dxVec.getZ() - dyVec.getZ());
+            }        
+        }; 
+    }    
+    
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
     private final static MouseButton DEFAULT_TRIGGER_BUTTON = MouseButton.SECONDARY;
     private final static Point3D STARTING_X_VEC = new Point3D(1, 0, 0);
     private final static Point3D STARTING_Y_VEC = new Point3D(0, 1, 0);
 
-    private final ObjectProperty<MouseButton> triggerButton = 
-            new SimpleObjectProperty<MouseButton>(this, "triggerButton", DEFAULT_TRIGGER_BUTTON);    
     private final DoubleProperty originX = new SimpleDoubleProperty(this, "originX", 0);
     private final DoubleProperty originY = new SimpleDoubleProperty(this, "originY", 0);
     private final DoubleProperty originZ = new SimpleDoubleProperty(this, "originZ", 0);
@@ -124,34 +114,18 @@ public final class InteractionDragPan {
     private final ObjectProperty<PerspectiveCamera> camera = 
             new SimpleObjectProperty<PerspectiveCamera>(this, "camera", null);
     
-    private final DoubleProperty width = new SimpleDoubleProperty(this, "width", 1.0);
-    private final DoubleProperty height = new SimpleDoubleProperty(this, "height", 1.0);
-    
-    private boolean coeffDirty = false;
+    private boolean coeffDirty = true;
     private double coeff;
     
     private void updateCoeff() {
         if (coeffDirty) {
             PerspectiveCamera pCam = camera.get();
             if (pCam != null) {
-                final double hfovRad = Math.toRadians(Util.getHorizontalFieldOfView(pCam, width.get(), height.get()));
-                coeff = 2.0 * distanceFromOrigin.get() * Math.tan(hfovRad / 2.0) / width.get();
+                final double hfovRad = Math.toRadians(Util.getHorizontalFieldOfView(pCam, getWidth(), getHeight()));
+                coeff = 2.0 * distanceFromOrigin.get() * Math.tan(hfovRad / 2.0) / getWidth();
             }
             coeffDirty = false;
         }
     }
-    
-    private final DragHelper dragHelper = new DragHelper(triggerButton, new DragHandlerAdaptor() {
-        @Override public void handleDrag(MouseEvent me, double deltaX, double deltaY) {
-            updateCoeff();
-            // find local x and y vector shifts for the camera
-            final Point3D dxVec = viewRotation.get().transform(STARTING_X_VEC).multiply(coeff * deltaX);
-            final Point3D dyVec = viewRotation.get().transform(STARTING_Y_VEC).multiply(coeff * deltaY);
-            // perform shifts along x and y
-            originX.set(originX.get() - dxVec.getX() - dyVec.getX());
-            originY.set(originY.get() - dxVec.getY() - dyVec.getY());
-            originZ.set(originZ.get() - dxVec.getZ() - dyVec.getZ());
-        }        
-    });
-        
+            
 }
