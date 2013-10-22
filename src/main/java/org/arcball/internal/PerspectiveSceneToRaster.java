@@ -25,12 +25,12 @@ public final class PerspectiveSceneToRaster implements CameraToRasterTransform {
     public void setParameters(PerspectiveCamera camera, Transform transformRotationTranslation,
                               double width, double height)
     {
-        this.camera = camera;
         this.transformRotationTranslation = transformRotationTranslation;
-        this.width = width;
-        this.height = height;
-        this.w2 = this.width / 2.0;
-        this.h2 = this.height / 2.0;
+        this.w2 = width / 2.0;
+        this.h2 = height / 2.0;
+        final double fov = Util.getHorizontalFieldOfView(camera, width, height);
+        final double focalLength = 1.0 / Math.tan(Math.toRadians(fov / 2.0));
+        this.flcoeff = focalLength * this.w2;
     }
     
     public void setParameters(PerspectiveCamera camera, Transform transformRotationTranslation, Scene scene) {
@@ -42,34 +42,25 @@ public final class PerspectiveSceneToRaster implements CameraToRasterTransform {
     }
     
     @Override public Point2D transform(double x, double y, double z) {
-        Point3D p3d = null;
         try {
-            p3d = transformRotationTranslation.inverseTransform(x, y, z);
-        } catch (NonInvertibleTransformException ex) { /* should not occur! */ }
-        final double c = focalLength() * w2 / p3d.getZ();
-        return new Point2D(c * p3d.getX() + w2, c * p3d.getY() + h2);
+            final Point3D p3d = transformRotationTranslation.inverseTransform(x, y, z);
+            final double c = flcoeff / p3d.getZ();
+            return new Point2D(c * p3d.getX() + w2, c * p3d.getY() + h2);
+        } catch (NonInvertibleTransformException ex) { return new Point2D(0, 0); /* should not occur! */ }
     }
     
     @Override public double transformRadius(double x, double y, double z, double radius) {
-        Point3D p3d = null;
         try {
-            p3d = transformRotationTranslation.inverseTransform(x, y, z);
-        } catch (NonInvertibleTransformException ex) { /* should not occur! */ }
-        return Math.abs(focalLength() * w2 * radius / p3d.getZ());
+            final Point3D p3d = transformRotationTranslation.inverseTransform(x, y, z);
+            return Math.abs(flcoeff * radius / p3d.getZ());
+        } catch (NonInvertibleTransformException ex) { return 0; /* should not occur! */ }
     }
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
-    private PerspectiveCamera camera;
     private Transform transformRotationTranslation;
-    private double width;
-    private double height;
     private double w2;
     private double h2;
-    
-    private double focalLength() {
-        final double fov = Util.getHorizontalFieldOfView(camera, width, height);
-        return 1.0 / Math.tan(Math.toRadians(fov / 2.0));
-    }
-    
+    private double flcoeff;
+        
 }
