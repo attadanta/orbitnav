@@ -1,6 +1,20 @@
+/**
+ * Copyright 2013 Dr Jonathan S Merritt
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with 
+ * the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on 
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the 
+ * specific language governing permissions and limitations under the License.
+ */
 package org.arcball.internal;
 
 import org.arcball.NavigationBehavior;
+import org.arcball.internal.geom.MutableVec3D;
+import org.arcball.internal.geom.MutableQuat3D;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -43,24 +57,25 @@ public final class InteractionDragArcball extends InteractionDrag {
         return new DragHandlerAdaptor() {
             @Override public void handleClick(MouseEvent me) {
                 projectScenePointToSphere(startArcballVector, me.getSceneX(), me.getSceneY());
-                startQuat.setAxisAngle(rotationAxisX.get(), rotationAxisY.get(), rotationAxisZ.get(), 
-                                       rotationAngle.get());
+                startQuat.setAxisAngleDegrees(rotationAxisX.get(), rotationAxisY.get(), rotationAxisZ.get(), 
+                                              rotationAngle.get());
             }
             @Override public void handleDrag(MouseEvent me, double deltaX, double deltaY) {
                 projectScenePointToSphere(currentArcballVector, me.getSceneX(), me.getSceneY());
                 // find the quaternion rotation between the initial arcball vector and the current arcball vector
-                rotationAxis.setToCross(startArcballVector, currentArcballVector);
-                final double angleRadians = -Math.acos(Math.min(1.0, startArcballVector.dot(currentArcballVector)));
-                deltaQuat.setAxisAngle(rotationAxis, Math.toDegrees(angleRadians));
+                rotationAxis.cross(startArcballVector, currentArcballVector);
+                final double arcballDot = MutableVec3D.dot(startArcballVector, currentArcballVector);
+                final double angleRadians = -Math.acos(Math.min(1.0, arcballDot));
+                deltaQuat.setAxisAngleRadians(rotationAxis, angleRadians);
                 // set the current rotation
                 if (angleRadians != 0) {
                     finalQuat.set(startQuat);
                     finalQuat.multiplyBy(deltaQuat);
                     finalQuat.normalize();
                     finalQuat.getAxis(rotationAxis);
-                    rotationAxisX.set(rotationAxis.x);
-                    rotationAxisY.set(rotationAxis.y);
-                    rotationAxisZ.set(rotationAxis.z);
+                    rotationAxisX.set(rotationAxis.getX());
+                    rotationAxisY.set(rotationAxis.getY());
+                    rotationAxisZ.set(rotationAxis.getZ());
                     rotationAngle.set(Util.normalizeAngle(finalQuat.getAngleDegrees()));
                 }
             }
@@ -78,12 +93,12 @@ public final class InteractionDragArcball extends InteractionDrag {
     private double centerY;  // centerY = height / 2
     private double radius;   // radius = max(width, height) / 3
     
-    private final MutableQuat startQuat = new MutableQuat();
-    private final MutableQuat deltaQuat = new MutableQuat();
-    private final MutableQuat finalQuat = new MutableQuat();
-    private final MutableVec startArcballVector = new MutableVec();    
-    private final MutableVec currentArcballVector = new MutableVec();
-    private final MutableVec rotationAxis = new MutableVec();
+    private final MutableQuat3D startQuat = new MutableQuat3D();
+    private final MutableQuat3D deltaQuat = new MutableQuat3D();
+    private final MutableQuat3D finalQuat = new MutableQuat3D();
+    private final MutableVec3D startArcballVector = new MutableVec3D();    
+    private final MutableVec3D currentArcballVector = new MutableVec3D();
+    private final MutableVec3D rotationAxis = new MutableVec3D();
     
     private void updateArcballCenterAndRadius() {
         centerX = getWidth() / 2.0;
@@ -91,7 +106,7 @@ public final class InteractionDragArcball extends InteractionDrag {
         radius = Math.max(getWidth(), getHeight()) / 3.0;
     }
     
-    private void projectScenePointToSphere(MutableVec result, double sceneX, double sceneY) {
+    private void projectScenePointToSphere(MutableVec3D result, double sceneX, double sceneY) {
         final double xp = (sceneX - centerX) / radius;
         final double yp = (sceneY - centerY) / radius;
         final double l2 = xp * xp + yp * yp;
@@ -103,74 +118,4 @@ public final class InteractionDragArcball extends InteractionDrag {
         }
     }
         
-    /**
-     * Mutable 3D vector.
-     */
-    private static final class MutableVec {
-        public void set(double x, double y, double z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-        public void setToCross(MutableVec a, MutableVec b) {
-            x = a.y * b.z - a.z * b.y;
-            y = a.z * b.x - a.x * b.z;
-            z = a.x * b.y - a.y * b.x;
-        }
-        public double dot(MutableVec v) { return (x * v.x + y * v.y + z * v.z); }
-        public double x;
-        public double y;
-        public double z;
-    }
-    
-    /**
-     * Mutable quaternion.
-     * Stored as a + b*i + c*j + d*k.
-     */
-    private static final class MutableQuat {
-        public void set(MutableQuat q) {
-            a = q.a;
-            b = q.b;
-            c = q.c;
-            d = q.d;
-        }
-        public void setAxisAngle(double x, double y, double z, double angleDegrees) {
-            final double a2 = Math.toRadians(angleDegrees) / 2.0;
-            a = Math.cos(a2);
-            final double coeff = Math.sin(a2) / Math.sqrt(x * x + y * y + z * z);
-            b = x * coeff;
-            c = y * coeff;
-            d = z * coeff;
-        }
-        public void setAxisAngle(MutableVec axis, double angleDegrees) {
-            setAxisAngle(axis.x, axis.y, axis.z, angleDegrees);
-        }
-        public double getAngleDegrees() { return Math.toDegrees(getAngleRadians()); }
-        public double getAngleRadians() { return 2.0 * Math.acos(a); }
-        public void getAxis(MutableVec result) {
-            final double o = 1.0 / Math.sin(Math.acos(a));
-            result.set(b * o, c * o, d * o);
-        }
-        public void multiplyBy(MutableQuat q) {
-            final double a1 = a;
-            final double b1 = b;
-            final double c1 = c;
-            final double d1 = d;
-            a = a1 * q.a - b1 * q.b - c1 * q.c - d1 * q.d;
-            b = a1 * q.b + b1 * q.a + c1 * q.d - d1 * q.c;
-            c = a1 * q.c - b1 * q.d + c1 * q.a + d1 * q.b;
-            d = a1 * q.d + b1 * q.c - c1 * q.b + d1 * q.a;
-        }
-        public void normalize() {
-            final double l = Math.sqrt(b * b + c * c + d * d);
-            b /= l;
-            c /= l;
-            d /= l;
-        }
-        private double a;
-        private double b;
-        private double c;
-        private double d;
-    }
-    
 }
