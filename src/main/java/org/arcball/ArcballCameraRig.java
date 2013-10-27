@@ -1,3 +1,15 @@
+/**
+ * Copyright 2013 Dr Jonathan S Merritt
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with 
+ * the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on 
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the 
+ * specific language governing permissions and limitations under the License.
+ */
 package org.arcball;
 
 import org.arcball.internal.InteractionDragArcball;
@@ -184,11 +196,9 @@ public final class ArcballCameraRig implements CameraRig {
     }
     
     private void updateTransformSceneToRaster() {
-        PerspectiveSceneToRaster s2r = (PerspectiveSceneToRaster)transformSceneToRaster.get();
-        if (scene != null) {
-            s2r.setParameters(camera.get(), transformRotationTranslation.get(), scene);
-        } else if (subscene != null) {
-            s2r.setParameters(camera.get(), transformRotationTranslation.get(), subscene);
+        final PerspectiveSceneToRaster s2r = (PerspectiveSceneToRaster)transformSceneToRaster.get();
+        if (host != null) {
+            s2r.setParameters(camera.get(), transformRotationTranslation.get(), host);
         }
         transformSceneToRaster.fireChangedEvent();
     }

@@ -55,7 +55,8 @@ public final class NavigationBehavior {
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
-    private NavigationBehavior(Input input, MouseButton button, Modifier modifier, Response response) {
+    private NavigationBehavior(Input input, MouseButton button, Modifier modifier, Response response) 
+    {
         this.input = input;
         this.button = button;
         this.modifier = modifier;

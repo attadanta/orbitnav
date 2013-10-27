@@ -179,11 +179,9 @@ public final class TurntableCameraRig implements CameraRig {
     }
         
     private void updateTransformSceneToRaster() {
-        PerspectiveSceneToRaster s2r = (PerspectiveSceneToRaster)transformSceneToRaster.get();
-        if (scene != null) {
-            s2r.setParameters(camera.get(), transformRotationTranslation.get(), scene);
-        } else if (subscene != null) {
-            s2r.setParameters(camera.get(), transformRotationTranslation.get(), subscene);            
+        final PerspectiveSceneToRaster s2r = (PerspectiveSceneToRaster)transformSceneToRaster.get();
+        if (host != null) {
+            s2r.setParameters(camera.get(), transformRotationTranslation.get(), host);
         }
         transformSceneToRaster.fireChangedEvent();
     }

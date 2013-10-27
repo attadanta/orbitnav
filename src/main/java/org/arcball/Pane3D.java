@@ -1,3 +1,15 @@
+/**
+ * Copyright 2013 Dr Jonathan S Merritt
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with 
+ * the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on 
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the 
+ * specific language governing permissions and limitations under the License.
+ */
 package org.arcball;
 
 import org.arcball.internal.AxisTriad;
@@ -8,6 +20,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
+import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -50,10 +63,10 @@ public final class Pane3D extends Pane {
     private final ObjectProperty<Paint> fill = new SimpleObjectProperty<Paint>(this, "fill", Color.DARKGREY);
     private final ObjectProperty<CameraRig> cameraRig = new SimpleObjectProperty<CameraRig>(this, "cameraRig", null);
     
-    private final SubScene subScene = new SubScene(getRoot(), 8, 8, true, true);
+    private final SubScene subScene = new SubScene(getRoot(), 8, 8, true, SceneAntialiasing.BALANCED);
     
     private final Group axisRoot = new Group();
-    private final SubScene axisSubscene = new SubScene(axisRoot, 128, 128, true, true);
+    private final SubScene axisSubscene = new SubScene(axisRoot, 128, 128, true, SceneAntialiasing.BALANCED);
     
     private void init() {
         subScene.fillProperty().bind(fill);
