@@ -8,6 +8,8 @@ import org.arcball.internal.InteractionScrollZoom;
 import org.arcball.internal.InteractionDragPan;
 import org.arcball.internal.NoGarbageProperty;
 import org.arcball.internal.PerspectiveSceneToRaster;
+import org.arcball.internal.geom.MutableAxisAngle3D;
+import org.arcball.internal.geom.MutableTurntable3D;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -161,11 +163,13 @@ public final class TurntableCameraRig implements CameraRig {
     private SubScene subscene = null;
     private InteractionHost host = null;
     
+    private final MutableTurntable3D turntableRotation = new MutableTurntable3D();
+    private final MutableAxisAngle3D axisAngleRotation = new MutableAxisAngle3D(); 
+    
     private void updateTransformRotationOnly() {
-        final Affine xform = (Affine)transformRotationOnly.get();
-        xform.setToIdentity();
-        xform.appendRotation(zRotation.get(), 0, 0, 0, 0, 0, 1);
-        xform.appendRotation(xRotation.get(), 0, 0, 0, 1, 0, 0);
+        turntableRotation.setDegrees(xRotation.get(), zRotation.get());
+        axisAngleRotation.set(turntableRotation);
+        axisAngleRotation.getAffine((Affine)transformRotationOnly.get());
         transformRotationOnly.fireChangedEvent();
     }    
     

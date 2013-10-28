@@ -37,6 +37,15 @@ public final class MutableQuat3D {
     }
     
     /**
+     * Sets this quaternion equal to an axis-angle rotation.
+     * @param a axis-angle rotation
+     */
+    public void set(MutableAxisAngle3D a) {
+        final MutableVec3D axis = a.getAxis();
+        setAxisAngleRadians(axis, a.getAngleRadians());
+    }
+    
+    /**
      * Sets this quaternion equal to an axis-angle rotation, with the angle specified in degrees.
      * @param x x component of the rotation axis
      * @param y y component of the rotation axis
@@ -99,22 +108,68 @@ public final class MutableQuat3D {
      */
     public void getAxis(MutableVec3D result) {
         final double coeff = 1.0 / Math.sin(Math.acos(a));
-        result.set(b * coeff, c * coeff, d * coeff);
+        if (!Double.isInfinite(coeff)) {
+            result.set(b * coeff, c * coeff, d * coeff);
+        } else {
+            result.set(1, 0, 0);
+        }
+    }
+    
+    /**
+     * Multiplies this quaternion by a set of quaternion components.
+     * @param a2 quaternion component
+     * @param b2 quaternion component
+     * @param c2 quaternion component
+     * @param d2 quaternion component
+     */
+    public void multiplyBy(double a2, double b2, double c2, double d2) {
+        final double a1 = a;
+        final double b1 = b;
+        final double c1 = c;
+        final double d1 = d;
+        a = a1 * a2 - b1 * b2 - c1 * c2 - d1 * d2;
+        b = a1 * b2 + b1 * a2 + c1 * d2 - d1 * c2;
+        c = a1 * c2 - b1 * d2 + c1 * a2 + d1 * b2;
+        d = a1 * d2 + b1 * c2 - c1 * b2 + d1 * a2;        
     }
     
     /**
      * Multiplies this quaternion by <code>q</code> and sets its value to the result of the multiplication.
      * @param q quaternion to post-muliply this quaternion
      */
-    public void multiplyBy(MutableQuat3D q) {
-        final double a1 = a;
-        final double b1 = b;
-        final double c1 = c;
-        final double d1 = d;
-        a = a1 * q.a - b1 * q.b - c1 * q.c - d1 * q.d;
-        b = a1 * q.b + b1 * q.a + c1 * q.d - d1 * q.c;
-        c = a1 * q.c - b1 * q.d + c1 * q.a + d1 * q.b;
-        d = a1 * q.d + b1 * q.c - c1 * q.b + d1 * q.a;        
+    public void multiplyBy(MutableQuat3D q) { multiplyBy(q.a, q.b, q.c, q.d); }
+    
+    /**
+     * Concatenates a rotation to this mutable quaternion.
+     * @param x x component of the axis of rotation
+     * @param y y component of the axis of rotation
+     * @param z z component of the axis of rotation
+     * @param angleRadians angle of rotation (radians)
+     */
+    public void concatRotationRadians(double x, double y, double z, double angleRadians) {
+        final double angle2 = angleRadians / 2.0;
+        final double coeff = Math.sin(angle2) / Math.sqrt(x * x + y * y + z * z);
+        final double a2 = Math.cos(angle2);
+        final double b2 = x * coeff;
+        final double c2 = y * coeff;
+        final double d2 = z * coeff;
+        multiplyBy(a2, b2, c2, d2);
+    }
+
+    /**
+     * Concatenates a rotation about the x-axis to this mutable quaternion.
+     * @param angleRadians angle of rotation about the x-axis (radians)
+     */
+    public void concatXRotationRadians(double angleRadians) {
+        concatRotationRadians(1, 0, 0, angleRadians);
+    }
+
+    /**
+     * Concatenates a rotation about the z-axis to this mutable quaternion.
+     * @param angleRadians angle of rotation about the z-axis (radians)
+     */
+    public void concatZRotationRadians(double angleRadians) {
+        concatRotationRadians(0, 0, 1, angleRadians);
     }
     
     /**
@@ -127,6 +182,10 @@ public final class MutableQuat3D {
         c /= l;
         d /= l;
     }    
+    
+    @Override public String toString() {
+        return "a = " + a + ", b = " + b + ", c = " + c + ", d = " + d;
+    }
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     

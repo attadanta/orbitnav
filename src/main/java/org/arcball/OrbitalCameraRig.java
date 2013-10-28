@@ -13,6 +13,7 @@
 
 package org.arcball;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,11 +27,16 @@ import org.arcball.internal.InteractionHost;
 import org.arcball.internal.InteractionScrollZoom;
 import org.arcball.internal.NoGarbageProperty;
 import org.arcball.internal.PerspectiveSceneToRaster;
+import org.arcball.internal.geom.MutableAxisAngle3D;
+import org.arcball.internal.geom.MutableTurntable3D;
+import org.arcball.internal.geom.MutableVec3D;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -39,9 +45,11 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Bounds;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
+import javafx.util.Duration;
 
 public final class OrbitalCameraRig implements Attachable {
 
@@ -50,12 +58,14 @@ public final class OrbitalCameraRig implements Attachable {
     public OrbitalCameraRig() {
         attachParameterListeners();
         attachArcballEnabledListener();
+        updateTransforms();
         // TODO:
     }
 
     public void attachToHost(InteractionHost host) {
         assert(this.host == null);
         this.host = host;
+        this.host.setCamera(camera.get());
         for (InteractionBase ib : interactionMap.values()) {
             attachInteractionToHost(ib);
         }
@@ -63,6 +73,7 @@ public final class OrbitalCameraRig implements Attachable {
     
     public void detachFromHost(InteractionHost host) {
         assert(this.host == host);
+        this.host.setCamera(null);
         for (InteractionBase ib : interactionMap.values()) {
             detachInteractionFromHost(ib);
         }
@@ -96,6 +107,41 @@ public final class OrbitalCameraRig implements Attachable {
         navigationBehaviorsList.clear();
     }
     
+    public void encompassBounds(Bounds bounds, double animationDurationMillis) {
+        // find the center of the bounds
+        double cx = (bounds.getMinX() + bounds.getMaxX()) / 2.0;
+        double cy = (bounds.getMinY() + bounds.getMaxY()) / 2.0;
+        double cz = (bounds.getMinZ() + bounds.getMaxZ()) / 2.0;
+        // find the "radius", as the maximum of the depth, height and width divided by 2
+        double r = Math.max(bounds.getDepth(), Math.max(bounds.getHeight(), bounds.getWidth())) / 2.0;
+        // configure camera
+        if (camera.get() instanceof PerspectiveCamera) {
+          PerspectiveCamera pCamera = (PerspectiveCamera)camera.get();
+          double fov = pCamera.getFieldOfView() * Math.PI / 180.0;
+          double d = r / Math.tan(fov / 2.0);
+          if (animationDurationMillis <= 0.0) {
+              distanceFromOrigin.set(1.1 * d);
+              setOrigin(cx, cy, cz);
+          } else {
+              Duration tf = Duration.millis(animationDurationMillis);
+              Timeline timeline = new Timeline();
+              timeline.getKeyFrames().add(new KeyFrame(tf, new KeyValue(distanceFromOrigin, 1.1 * d)));
+              timeline.getKeyFrames().add(new KeyFrame(tf, new KeyValue(originX, cx)));
+              timeline.getKeyFrames().add(new KeyFrame(tf, new KeyValue(originY, cy)));
+              timeline.getKeyFrames().add(new KeyFrame(tf, new KeyValue(originZ, cz)));
+              timeline.play();
+          }
+          pCamera.setNearClip(0.05 * d);
+          pCamera.setFarClip(10.0 * d);
+        }
+    }    
+    
+    public void setOrigin(double x, double y, double z) {
+        originX.set(x);
+        originY.set(y);
+        originZ.set(z);
+    }
+    
     public ReadOnlyListProperty<NavigationBehavior> navigationBehaviorsListProperty() { 
         return navigationBehaviorsList; 
     }
@@ -106,12 +152,17 @@ public final class OrbitalCameraRig implements Attachable {
     
     public void setArcballEnabled(boolean value) { arcballEnabled.set(value); }
     
+    public ReadOnlyObjectProperty<Transform> transformRotationOnlyProperty() { return transformRotationOnly; }
+    
+    public ReadOnlyObjectProperty<CameraToRasterTransform> transformToRasterProperty() { return transformToRaster; }
+    
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
     private final BooleanProperty arcballEnabled =
             new SimpleBooleanProperty(this, "arcballEnabled", false);
     private final ListProperty<NavigationBehavior> navigationBehaviorsList = 
-            new SimpleListProperty<NavigationBehavior>(this, "navigationBehaviorsList");
+            new SimpleListProperty<NavigationBehavior>(this, "navigationBehaviorsList",
+                    javafx.collections.FXCollections.observableList(new ArrayList<NavigationBehavior>()));
     
     private final DoubleProperty originX = new SimpleDoubleProperty(this, "originX", 0);
     private final DoubleProperty originY = new SimpleDoubleProperty(this, "originY", 0);
@@ -121,8 +172,8 @@ public final class OrbitalCameraRig implements Attachable {
     private final DoubleProperty rotationAxisX = new SimpleDoubleProperty(this, "rotationAxisX", 0);
     private final DoubleProperty rotationAxisY = new SimpleDoubleProperty(this, "rotationAxisY", 0);
     private final DoubleProperty rotationAxisZ = new SimpleDoubleProperty(this, "rotationAxisZ", 0);
-    private final DoubleProperty xArcballRotation = new SimpleDoubleProperty(this, "xArcballRotation", 0);
-    private final DoubleProperty zArcballRotation = new SimpleDoubleProperty(this, "zArcballRotation", 0);
+    private final DoubleProperty xTurntableRotation = new SimpleDoubleProperty(this, "xTurntableRotation", 0);
+    private final DoubleProperty zTurntableRotation = new SimpleDoubleProperty(this, "zTurntableRotation", 0);
     
     private final ReadOnlyObjectProperty<PerspectiveCamera> camera =
             new SimpleObjectProperty<PerspectiveCamera>(this, "camera", new PerspectiveCamera(true));
@@ -139,16 +190,26 @@ public final class OrbitalCameraRig implements Attachable {
     
     private InteractionHost host = null;
     
+    private final MutableTurntable3D turntableRotation = new MutableTurntable3D();
+    private final MutableAxisAngle3D axisAngleRotation = new MutableAxisAngle3D();
+    
     private void updateTransformRotationOnly() {
-        final Affine xform = (Affine)transformRotationOnly.get();
-        xform.setToIdentity();
         if (!arcballEnabled.get()) {
-            // TODO: set rotation angle and axis from turntable rotations
+            // set rotation angle and axis from turntable rotations
+            turntableRotation.setDegrees(xTurntableRotation.get(), zTurntableRotation.get());
+            axisAngleRotation.set(turntableRotation);
+            final MutableVec3D axis = axisAngleRotation.getAxis();
+            rotationAxisX.set(axis.getX());
+            rotationAxisY.set(axis.getY());
+            rotationAxisZ.set(axis.getZ());
+            rotationAngle.set(axisAngleRotation.getAngleDegrees());
         } else {
-            // TODO: find closest matching turntable rotations from angle and axis
+            // find closest matching turntable rotations from angle and axis
+            axisAngleRotation.setDegrees(rotationAxisX.get(), rotationAxisY.get(), rotationAxisZ.get(), 
+                                         rotationAngle.get());
+            turntableRotation.setToClosestAxisAngle(axisAngleRotation);
         }
-        xform.appendRotation(rotationAngle.get(), 0, 0, 0,
-                             rotationAxisX.get(), rotationAxisY.get(), rotationAxisZ.get());
+        axisAngleRotation.getAffine((Affine)transformRotationOnly.get());
         transformRotationOnly.fireChangedEvent();
     }
     
@@ -203,7 +264,7 @@ public final class OrbitalCameraRig implements Attachable {
                 if (isArcballEnabled()) {
                     ib = new InteractionDragArcball(rotationAngle, rotationAxisX, rotationAxisY, rotationAxisZ);
                 } else {
-                    ib = new InteractionDragXZTurntable(xArcballRotation, zArcballRotation);
+                    ib = new InteractionDragXZTurntable(xTurntableRotation, zTurntableRotation);
                 }
                 break;
             }
@@ -236,8 +297,8 @@ public final class OrbitalCameraRig implements Attachable {
         originY.addListener(parameterNumberListener);
         originZ.addListener(parameterNumberListener);
         distanceFromOrigin.addListener(parameterNumberListener);
-        xArcballRotation.addListener(parameterNumberListener);
-        zArcballRotation.addListener(parameterNumberListener);
+        xTurntableRotation.addListener(parameterNumberListener);
+        zTurntableRotation.addListener(parameterNumberListener);
         rotationAngle.addListener(parameterNumberListener);
         rotationAxisX.addListener(parameterNumberListener);
         rotationAxisY.addListener(parameterNumberListener);
@@ -261,7 +322,7 @@ public final class OrbitalCameraRig implements Attachable {
                             ib = new InteractionDragArcball(rotationAngle, 
                                     rotationAxisX, rotationAxisY, rotationAxisZ);
                         } else {
-                            ib = new InteractionDragXZTurntable(xArcballRotation, zArcballRotation);
+                            ib = new InteractionDragXZTurntable(xTurntableRotation, zTurntableRotation);
                         }
                         // replace rotation in the map
                         interactionMap.put(nb, ib);

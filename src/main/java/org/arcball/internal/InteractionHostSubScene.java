@@ -16,6 +16,7 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.scene.Camera;
 import javafx.scene.SubScene;
 
 /**
@@ -50,6 +51,8 @@ public class InteractionHostSubScene implements InteractionHost {
     @Override public double getWidth() { return subscene.getWidth(); }
 
     @Override public double getHeight() { return subscene.getHeight(); }
+    
+    @Override public void setCamera(Camera camera) { subscene.setCamera(camera); }
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
 

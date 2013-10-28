@@ -67,7 +67,7 @@ public final class ArcballSampleApp extends Application {
         
         Group geometryGroup = buildGeometry();
         world.getChildren().add(geometryGroup);
-        pane3D.getCameraRig().encompassBounds(geometryGroup.getBoundsInParent(), 0);
+        pane3D.viewAll(0);
         
         //TurntableCameraRig tcr = (TurntableCameraRig)pane3D.getCameraRig();
         //tcr.zRotationProperty().set(140);
@@ -125,7 +125,7 @@ public final class ArcballSampleApp extends Application {
                     tempEllipse.setVisible(true);
                     System.out.println("Clicked atom " + atom.getElementName());
                     final VizAtom a2 = atom;
-                    pane3D.getCameraRig().transformSceneToRasterProperty().addListener(new ChangeListener<CameraToRasterTransform>() {
+                    pane3D.transformToRasterProperty().addListener(new ChangeListener<CameraToRasterTransform>() {
                        @Override public void changed(ObservableValue<? extends CameraToRasterTransform> ob,
                                                      CameraToRasterTransform oldTransform, CameraToRasterTransform newTransform) {
                            Point2D p = newTransform.transform(a2.getX(), a2.getY(), a2.getZ());
@@ -136,7 +136,7 @@ public final class ArcballSampleApp extends Application {
                            tempEllipse.setRadiusY(1.5 * r);
                        }
                     });
-                    CameraToRasterTransform x = pane3D.getCameraRig().transformSceneToRasterProperty().get();
+                    CameraToRasterTransform x = pane3D.transformToRasterProperty().get();
                     Point2D p = x.transform(a2.getX(), a2.getY(), a2.getZ());
                     double r = x.transformRadius(a2.getX(), a2.getY(), a2.getZ(), a2.getRadius());
                     tempEllipse.setCenterX(p.getX());
@@ -166,6 +166,7 @@ public final class ArcballSampleApp extends Application {
     
     private void updateViewPropertiesPane() {
         viewPropertiesPane.clearProperties();
+        /*
         CameraRig cameraRig = pane3D.getCameraRig();
         if (cameraRig instanceof TurntableCameraRig) {
             TurntableCameraRig tcr = (TurntableCameraRig)cameraRig;
@@ -185,6 +186,7 @@ public final class ArcballSampleApp extends Application {
             viewPropertiesPane.addDoubleProperty("rotationAxisZ", acr.rotationAxisZProperty());
             viewPropertiesPane.addDoubleProperty("rotationAngle", acr.rotationAngleProperty());
         }
+        */
     }
 
     private final Pane3D pane3D = new Pane3D();

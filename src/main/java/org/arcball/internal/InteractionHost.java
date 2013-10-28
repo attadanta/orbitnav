@@ -16,6 +16,7 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.scene.Camera;
 
 public interface InteractionHost {
     <T extends Event> void addEventHandler(EventType<T> eventType, EventHandler<? super T> eventHandler);
@@ -24,4 +25,5 @@ public interface InteractionHost {
     ReadOnlyDoubleProperty heightProperty();
     double getWidth();
     double getHeight();
+    public void setCamera(Camera camera);
 }
