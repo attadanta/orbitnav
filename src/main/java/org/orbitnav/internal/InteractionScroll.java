@@ -17,8 +17,6 @@ import javafx.scene.input.ScrollEvent;
 
 import org.orbitnav.NavigationBehavior;
 
-import static org.orbitnav.NavigationBehavior.Input.SCROLL;
-
 public abstract class InteractionScroll extends InteractionBase {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
@@ -26,7 +24,7 @@ public abstract class InteractionScroll extends InteractionBase {
     public InteractionScroll() {
         super();
         // it only makes sense for SCROLL navigation behavior to be assigned; so assert() that
-        navigationBehaviorProperty().addListener((ob, old, value) -> { assert(value.getInput() == SCROLL); });
+        navigationBehaviorProperty().addListener((ob, old, value) -> { assert(value.isGestureScroll()); });
     }
     
     @Override public void attachToHost(InteractionHost host) {
@@ -45,7 +43,7 @@ public abstract class InteractionScroll extends InteractionBase {
     
     protected boolean scrollEventMatches(ScrollEvent se) {
         final NavigationBehavior nb = getNavigationBehavior();
-        return ((nb == null) || (nb.scrollEventMatches(se)));
+        return ((nb == null) || (nb.inputEventMatches(se)));
     }
     
 }

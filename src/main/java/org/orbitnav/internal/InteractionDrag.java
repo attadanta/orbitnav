@@ -12,8 +12,6 @@
  */
 package org.orbitnav.internal;
 
-import static org.orbitnav.NavigationBehavior.Input.DRAG;
-
 /**
  * Abstract base class for all dragging interactions.
  * 
@@ -26,7 +24,7 @@ public abstract class InteractionDrag extends InteractionBase {
     public InteractionDrag() {
         super();
         // it only makes sense for DRAG navigation behavior to be assigned; so assert() that
-        navigationBehaviorProperty().addListener((o, old, value) -> { assert(value.getInput() == DRAG); });
+        navigationBehaviorProperty().addListener((o, old, value) -> { assert(value.isMouseDrag()); });
     }
     
     @Override public void attachToHost(InteractionHost host) {

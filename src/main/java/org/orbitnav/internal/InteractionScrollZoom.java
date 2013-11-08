@@ -14,6 +14,7 @@
 package org.orbitnav.internal;
 
 import org.orbitnav.NavigationBehavior;
+import static org.orbitnav.NavigationBehavior.Activity.ZOOM;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -30,7 +31,7 @@ public final class InteractionScrollZoom extends InteractionScroll {
     //---------------------------------------------------------------------------------------------------------- PUBLIC
 
     public InteractionScrollZoom(DoubleProperty distanceFromOrigin) {
-        setNavigationBehavior(NavigationBehavior.scroll(NavigationBehavior.Response.ZOOM));
+        setNavigationBehavior(NavigationBehavior.gestureScroll(ZOOM));
         this.distanceFromOrigin.bindBidirectional(distanceFromOrigin);
     }
 

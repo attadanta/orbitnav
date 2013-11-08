@@ -13,8 +13,8 @@
 package org.orbitnav.internal;
 
 import org.orbitnav.NavigationBehavior;
+import static org.orbitnav.NavigationBehavior.Activity.ZOOM;
 
-import static org.orbitnav.NavigationBehavior.Response.ZOOM;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import static javafx.scene.input.MouseButton.MIDDLE;
@@ -31,7 +31,7 @@ public class InteractionDragZoom extends InteractionDrag {
     
     public InteractionDragZoom(DoubleProperty distanceFromOrigin) {
         this.distanceFromOrigin.bindBidirectional(distanceFromOrigin);
-        setNavigationBehavior(NavigationBehavior.drag(MIDDLE, ZOOM));
+        setNavigationBehavior(NavigationBehavior.mouseDrag(MIDDLE, ZOOM));
     }
     
     public DoubleProperty distanceFromOriginProperty() { return distanceFromOrigin; }

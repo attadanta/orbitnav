@@ -12,7 +12,7 @@
  */
 package org.orbitnav.internal;
 
-import static org.orbitnav.NavigationBehavior.Response.ROTATE;
+import static org.orbitnav.NavigationBehavior.Activity.ROTATE;
 
 import org.orbitnav.NavigationBehavior;
 import org.orbitnav.internal.geom.MutableQuat3D;
@@ -45,7 +45,7 @@ public final class InteractionDragArcball extends InteractionDrag {
         widthProperty().addListener(whChangeListener);
         heightProperty().addListener(whChangeListener);
         
-        setNavigationBehavior(NavigationBehavior.drag(PRIMARY, ROTATE));        
+        setNavigationBehavior(NavigationBehavior.mouseDrag(PRIMARY, ROTATE));
     }
 
     //------------------------------------------------------------------------------------------------------- PROTECTED

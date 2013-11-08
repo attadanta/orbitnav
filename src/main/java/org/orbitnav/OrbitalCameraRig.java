@@ -239,36 +239,41 @@ public final class OrbitalCameraRig implements Attachable {
     
     private InteractionBase createInteraction(NavigationBehavior nb) {
         InteractionBase ib = null;
-        switch (nb.getInput()) {
-        case SCROLL:
-            switch (nb.getResponse()) {
-            case PAN:
-                break;  // TODO
-            case ZOOM:
-                ib = new InteractionScrollZoom(distanceFromOrigin);
-                break;
-            case ROTATE:
-                break; // TODO
+
+        if (nb.isMouseDrag()) {
+            switch (nb.getActivity()) {
+                case PAN:
+                    ib = new InteractionDragPan(
+                            originX, originY, originZ, transformRotationOnly, distanceFromOrigin, camera
+                    );
+                    break;
+                case ZOOM:
+                    ib = new InteractionDragZoom(distanceFromOrigin);
+                    break;
+                case ROTATE:
+                    if (isArcballEnabled()) {
+                        ib = new InteractionDragArcball(rotationAngle, rotationAxisX, rotationAxisY, rotationAxisZ);
+                    } else {
+                        ib = new InteractionDragXZTurntable(xTurntableRotation, zTurntableRotation);
+                    }
+                    break;
             }
-            break;
-        case DRAG:
-            switch (nb.getResponse()) {
-            case PAN:
-                ib = new InteractionDragPan(originX, originY, originZ, transformRotationOnly, distanceFromOrigin, 
-                        camera);
-                break;
-            case ZOOM:
-                ib = new InteractionDragZoom(distanceFromOrigin);
-                break;
-            case ROTATE:
-                if (isArcballEnabled()) {
-                    ib = new InteractionDragArcball(rotationAngle, rotationAxisX, rotationAxisY, rotationAxisZ);
-                } else {
-                    ib = new InteractionDragXZTurntable(xTurntableRotation, zTurntableRotation);
-                }
-                break;
+        } else if (nb.isGestureRotate()) {
+            // TODO:
+        } else if (nb.isGestureScroll()) {
+            switch (nb.getActivity()) {
+                case PAN:   // TODO
+                    break;
+                case ZOOM:
+                    ib = new InteractionScrollZoom(distanceFromOrigin);
+                    break;
+                case ROTATE:    // TODO
+                    break;
             }
+        } else if (nb.isGestureZoom()) {
+            // TODO:
         }
+
         if (ib != null) {
             ib.setNavigationBehavior(nb);
         }
@@ -311,9 +316,7 @@ public final class OrbitalCameraRig implements Attachable {
                 // when the arcball status changes, we have to traverse the map of interactions and interchange
                 //  arcball and xz-turntable style drags
                 for (NavigationBehavior nb : interactionMap.keySet()) {
-                    if ((nb.getResponse() == NavigationBehavior.Response.ROTATE) &&
-                        (nb.getInput() == NavigationBehavior.Input.DRAG)) 
-                    {
+                    if ((nb.getActivity() == NavigationBehavior.Activity.ROTATE) && nb.isMouseDrag()) {
                         // detach existing rotation from the host
                         detachInteractionFromHost(interactionMap.get(nb));
                         // create new rotation

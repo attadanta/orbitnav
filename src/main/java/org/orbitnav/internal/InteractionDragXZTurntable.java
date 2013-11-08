@@ -13,8 +13,8 @@
 package org.orbitnav.internal;
 
 import org.orbitnav.NavigationBehavior;
+import static org.orbitnav.NavigationBehavior.Activity.ROTATE;
 
-import static org.orbitnav.NavigationBehavior.Response.ROTATE;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import static javafx.scene.input.MouseButton.PRIMARY;
@@ -33,7 +33,7 @@ public final class InteractionDragXZTurntable extends InteractionDrag {
         this.xRotation.bindBidirectional(xRotation);
         this.zRotation.bindBidirectional(zRotation);
         
-        setNavigationBehavior(NavigationBehavior.drag(PRIMARY, ROTATE));        
+        setNavigationBehavior(NavigationBehavior.mouseDrag(PRIMARY, ROTATE));
     }
 
     public DoubleProperty xRotationProperty() { return xRotation; }

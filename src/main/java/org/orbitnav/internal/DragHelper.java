@@ -14,7 +14,6 @@ package org.orbitnav.internal;
 
 import org.orbitnav.NavigationBehavior;
 
-import static org.orbitnav.NavigationBehavior.Input.DRAG;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
@@ -43,7 +42,7 @@ public final class DragHelper implements Attachable {
      */
     public DragHelper(ObjectProperty<NavigationBehavior> navigationBehavior, DragHandler dragHandler) {
         // it only makes sense for DRAG navigation behavior to be assigned; so assert() that
-        this.navigationBehavior.addListener((o, old, value) -> { assert(value.getInput() == DRAG); } );
+        this.navigationBehavior.addListener((o, old, value) -> { assert(value.isMouseDrag()); } );
         
         this.navigationBehavior.bind(navigationBehavior);
         this.dragHandler = dragHandler;        
@@ -102,7 +101,7 @@ public final class DragHelper implements Attachable {
     
     private final EventHandler<MouseEvent> mousePressHandler = (m) -> {
     	final NavigationBehavior nb = navigationBehavior.get();
-    	if ((nb == null) || (nb.mouseEventMatches(m))) {
+    	if ((nb == null) || (nb.inputEventMatches(m))) {
     		x = m.getSceneX();
     		y = m.getSceneY();
     		dragHandler.handleClick(m);
@@ -111,7 +110,7 @@ public final class DragHelper implements Attachable {
 
     private final EventHandler<MouseEvent> mouseDragHandler = (m) -> {
     	final NavigationBehavior nb = navigationBehavior.get();
-    	if ((nb == null) || (nb.mouseEventMatches(m))) {
+    	if ((nb == null) || (nb.inputEventMatches(m))) {
     		final double oldX = x;
     		final double oldY = y;
     		x = m.getSceneX();

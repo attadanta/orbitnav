@@ -13,8 +13,8 @@
 package org.orbitnav.internal;
 
 import org.orbitnav.NavigationBehavior;
+import static org.orbitnav.NavigationBehavior.Activity.PAN;
 
-import static org.orbitnav.NavigationBehavior.Response.PAN;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -63,7 +63,7 @@ public final class InteractionDragPan extends InteractionDrag {
         this.camera.bind(camera);
         
         // set the default interaction behavior
-        setNavigationBehavior(NavigationBehavior.drag(SECONDARY, PAN));
+        setNavigationBehavior(NavigationBehavior.mouseDrag(SECONDARY, PAN));
         
         // listen for other changes that affect the pan scale coefficient
         final ChangeListener<Number> coeffParamListener = (ob, old, value) -> coeffDirty = true;

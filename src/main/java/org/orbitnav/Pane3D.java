@@ -14,6 +14,7 @@ package org.orbitnav;
 
 import org.orbitnav.internal.AxisTriad;
 import org.orbitnav.internal.InteractionHostSubScene;
+import static org.orbitnav.NavigationBehavior.Activity.*;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -25,6 +26,7 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.input.MouseButton;
+import static javafx.scene.input.MouseButton.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -85,10 +87,10 @@ public final class Pane3D extends Pane {
         
         cameraRig.setArcballEnabled(true);
         cameraRig.attachToHost(new InteractionHostSubScene(subScene));
-        cameraRig.addNavigationBehavior(NavigationBehavior.drag(MouseButton.PRIMARY, NavigationBehavior.Response.ROTATE));
-        cameraRig.addNavigationBehavior(NavigationBehavior.drag(MouseButton.SECONDARY, NavigationBehavior.Response.PAN));
-        cameraRig.addNavigationBehavior(NavigationBehavior.drag(MouseButton.MIDDLE, NavigationBehavior.Response.ZOOM));
-        cameraRig.addNavigationBehavior(NavigationBehavior.scroll(NavigationBehavior.Response.ZOOM));
+        cameraRig.addNavigationBehavior(NavigationBehavior.mouseDrag(PRIMARY, ROTATE));
+        cameraRig.addNavigationBehavior(NavigationBehavior.mouseDrag(SECONDARY, PAN));
+        cameraRig.addNavigationBehavior(NavigationBehavior.mouseDrag(MIDDLE, ZOOM));
+        cameraRig.addNavigationBehavior(NavigationBehavior.gestureScroll(ZOOM));
         cameraRig.setArcballEnabled(false);
         
         PerspectiveCamera axisCamera = new PerspectiveCamera(true);
