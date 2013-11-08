@@ -12,16 +12,12 @@
  */
 package org.orbitnav.internal;
 
-import static org.orbitnav.NavigationBehavior.Activity.ROTATE;
-
-import org.orbitnav.NavigationBehavior;
 import org.orbitnav.internal.geom.MutableQuat3D;
 import org.orbitnav.internal.geom.MutableVec3D;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
-import static javafx.scene.input.MouseButton.PRIMARY;
 import javafx.scene.input.MouseEvent;
 
 /**

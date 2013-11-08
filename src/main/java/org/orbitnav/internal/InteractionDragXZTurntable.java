@@ -12,12 +12,8 @@
  */
 package org.orbitnav.internal;
 
-import org.orbitnav.NavigationBehavior;
-import static org.orbitnav.NavigationBehavior.Activity.ROTATE;
-
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import static javafx.scene.input.MouseButton.PRIMARY;
 import javafx.scene.input.MouseEvent;
 
 /**
