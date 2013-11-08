@@ -47,7 +47,7 @@ public abstract class InteractionBase implements Attachable {
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
     private final ObjectProperty<NavigationBehavior> navigationBehavior =
-            new SimpleObjectProperty<NavigationBehavior>(this, "navigationBehavior", null);
+            new SimpleObjectProperty<>(this, "navigationBehavior", null);
     private final DoubleProperty width = new SimpleDoubleProperty(this, "width", 1.0);
     private final DoubleProperty height = new SimpleDoubleProperty(this, "height", 1.0);    
     

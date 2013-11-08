@@ -95,7 +95,7 @@ public final class DragHelper implements Attachable {
     
     private ObjectProperty<NavigationBehavior> navigationBehavior =
             new SimpleObjectProperty<>(this, "navigationBehavior", null);
-    private DragHandler dragHandler; // TODO: ideally, DragHandler should be final, but problems arise with lambdas
+    private DragHandler dragHandler; // TODO: dragHandler should be final, but problems arise with lambdas
     private double x;
     private double y;
     private InteractionHost host = null;

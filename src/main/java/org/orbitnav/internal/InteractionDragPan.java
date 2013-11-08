@@ -114,8 +114,7 @@ public final class InteractionDragPan extends InteractionDrag {
     private final ObjectProperty<Transform> viewRotation = 
             new SimpleObjectProperty<Transform>(this, "viewRotation", new Affine());
     private final DoubleProperty distanceFromOrigin = new SimpleDoubleProperty(this, "distanceFromOrigin", 10);
-    private final ObjectProperty<PerspectiveCamera> camera = 
-            new SimpleObjectProperty<PerspectiveCamera>(this, "camera", null);
+    private final ObjectProperty<PerspectiveCamera> camera = new SimpleObjectProperty<>(this, "camera", null);
     
     private boolean coeffDirty = true;
     private double coeff;

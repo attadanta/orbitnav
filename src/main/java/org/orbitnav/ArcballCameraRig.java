@@ -158,7 +158,7 @@ public final class ArcballCameraRig implements CameraRig {
     private final DoubleProperty distanceFromOrigin = new SimpleDoubleProperty(this, "distanceFromOrigin", 10);
     
     private final ObjectProperty<PerspectiveCamera> camera =
-            new SimpleObjectProperty<PerspectiveCamera>(this, "camera", new PerspectiveCamera(true));
+            new SimpleObjectProperty<>(this, "camera", new PerspectiveCamera(true));
     private final NoGarbageProperty<Transform> transformRotationOnly =
             new NoGarbageProperty<Transform>(this, "transformRotationOnly", new Affine());
     private final NoGarbageProperty<Transform> transformRotationTranslation =
