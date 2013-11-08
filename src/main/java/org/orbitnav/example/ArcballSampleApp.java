@@ -3,10 +3,8 @@ package org.orbitnav.example;
 import java.io.File;
 import java.util.List;
 
-import org.orbitnav.CameraRig;
 import org.orbitnav.CameraToRasterTransform;
 import org.orbitnav.Pane3D;
-import org.orbitnav.TurntableCameraRig;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -15,7 +13,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Point2D;
-import javafx.geometry.Point3D;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -29,11 +26,7 @@ import javafx.scene.input.PickResult;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Sphere;
-import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 
 public final class ArcballSampleApp extends Application {
