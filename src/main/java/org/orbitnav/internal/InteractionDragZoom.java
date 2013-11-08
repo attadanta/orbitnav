@@ -12,12 +12,8 @@
  */
 package org.orbitnav.internal;
 
-import org.orbitnav.NavigationBehavior;
-import static org.orbitnav.NavigationBehavior.Activity.ZOOM;
-
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import static javafx.scene.input.MouseButton.MIDDLE;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -31,27 +27,22 @@ public class InteractionDragZoom extends InteractionDrag {
     
     public InteractionDragZoom(DoubleProperty distanceFromOrigin) {
         this.distanceFromOrigin.bindBidirectional(distanceFromOrigin);
-        setNavigationBehavior(NavigationBehavior.mouseDrag(MIDDLE, ZOOM));
     }
-    
-    public DoubleProperty distanceFromOriginProperty() { return distanceFromOrigin; }
-    
-    public DoubleProperty zoomCoefficientProperty() { return zoomCoefficient; }    
     
     //------------------------------------------------------------------------------------------------------- PROTECTED
     
-    protected DragHandler getDragHandler() {
-        return new DragHandlerAdaptor() {
-            @Override public void handleDrag(MouseEvent me, double deltaX, double deltaY) {
-                final double coeff = zoomCoefficient.get();
-                distanceFromOrigin.set((1.0 + (coeff * deltaY)) * distanceFromOrigin.get());
-            }
-        };
-    }
-        
+    protected DragHandler getDragHandler() { return dragHandler; }
+
     //--------------------------------------------------------------------------------------------------------- PRIVATE
 
     private final DoubleProperty distanceFromOrigin = new SimpleDoubleProperty(this, "distanceFromOrigin", 0);
     private final DoubleProperty zoomCoefficient = new SimpleDoubleProperty(this, "zoomCoefficient", 0.003);
-    
+
+    private final DragHandler dragHandler = new DragHandlerAdaptor() {
+        @Override public void handleDrag(MouseEvent me, double deltaX, double deltaY) {
+            final double coeff = zoomCoefficient.get();
+            distanceFromOrigin.set((1.0 + (coeff * deltaY)) * distanceFromOrigin.get());
+        }
+    };
+
 }

@@ -35,10 +35,6 @@ public final class InteractionScrollZoom extends InteractionScroll {
         this.distanceFromOrigin.bindBidirectional(distanceFromOrigin);
     }
 
-    public DoubleProperty distanceFromOriginProperty() { return distanceFromOrigin; }
-
-    public DoubleProperty zoomCoefficientProperty() { return zoomCoefficient; }
-
     //------------------------------------------------------------------------------------------------------- PROTECTED
 
     protected EventHandler<ScrollEvent> getScrollHandler() { return scrollHandler; }
@@ -51,7 +47,7 @@ public final class InteractionScrollZoom extends InteractionScroll {
     private final EventHandler<ScrollEvent> scrollHandler = new EventHandler<ScrollEvent>() {
         @Override
         public void handle(ScrollEvent se) {
-            if (scrollEventMatches(se)) {
+            if (getNavigationBehavior().inputEventMatches(se)) {
                 final double coeff = zoomCoefficient.get();
                 distanceFromOrigin.set((1.0 - (coeff * se.getDeltaY())) * distanceFromOrigin.get());
             }

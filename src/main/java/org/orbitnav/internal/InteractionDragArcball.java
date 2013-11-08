@@ -44,41 +44,12 @@ public final class InteractionDragArcball extends InteractionDrag {
         ChangeListener<Number> whChangeListener = (o, old, value) -> updateArcballCenterAndRadius();
         widthProperty().addListener(whChangeListener);
         heightProperty().addListener(whChangeListener);
-        
-        setNavigationBehavior(NavigationBehavior.mouseDrag(PRIMARY, ROTATE));
     }
 
     //------------------------------------------------------------------------------------------------------- PROTECTED
 
-    protected DragHandler getDragHandler() {
-        return new DragHandlerAdaptor() {
-            @Override public void handleClick(MouseEvent me) {
-                projectScenePointToSphere(startArcballVector, me.getSceneX(), me.getSceneY());
-                startQuat.setAxisAngleDegrees(rotationAxisX.get(), rotationAxisY.get(), rotationAxisZ.get(), 
-                                              rotationAngle.get());
-            }
-            @Override public void handleDrag(MouseEvent me, double deltaX, double deltaY) {
-                projectScenePointToSphere(currentArcballVector, me.getSceneX(), me.getSceneY());
-                // find the quaternion rotation between the initial arcball vector and the current arcball vector
-                rotationAxis.cross(startArcballVector, currentArcballVector);
-                final double arcballDot = MutableVec3D.dot(startArcballVector, currentArcballVector);
-                final double angleRadians = -Math.acos(Math.min(1.0, arcballDot));
-                deltaQuat.setAxisAngleRadians(rotationAxis, angleRadians);
-                // set the current rotation
-                if (angleRadians != 0) {
-                    finalQuat.set(startQuat);
-                    finalQuat.multiplyBy(deltaQuat);
-                    finalQuat.normalize();
-                    finalQuat.getAxis(rotationAxis);
-                    rotationAxisX.set(rotationAxis.getX());
-                    rotationAxisY.set(rotationAxis.getY());
-                    rotationAxisZ.set(rotationAxis.getZ());
-                    rotationAngle.set(Util.normalizeAngle(finalQuat.getAngleDegrees()));
-                }
-            }
-        };
-    }    
-    
+    protected DragHandler getDragHandler() { return dragHandler; }
+
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
     private final DoubleProperty rotationAxisX = new SimpleDoubleProperty(this, "rotationAxisX", 0);
@@ -114,5 +85,32 @@ public final class InteractionDragArcball extends InteractionDrag {
             result.set(xp / l, yp / l, 0);
         }
     }
-        
+
+    private final DragHandler dragHandler = new DragHandler() {
+        @Override public void handleClick(MouseEvent me) {
+            projectScenePointToSphere(startArcballVector, me.getSceneX(), me.getSceneY());
+            startQuat.setAxisAngleDegrees(rotationAxisX.get(), rotationAxisY.get(), rotationAxisZ.get(),
+                    rotationAngle.get());
+        }
+        @Override public void handleDrag(MouseEvent me, double deltaX, double deltaY) {
+            projectScenePointToSphere(currentArcballVector, me.getSceneX(), me.getSceneY());
+            // find the quaternion rotation between the initial arcball vector and the current arcball vector
+            rotationAxis.cross(startArcballVector, currentArcballVector);
+            final double arcballDot = MutableVec3D.dot(startArcballVector, currentArcballVector);
+            final double angleRadians = -Math.acos(Math.min(1.0, arcballDot));
+            deltaQuat.setAxisAngleRadians(rotationAxis, angleRadians);
+            // set the current rotation
+            if (angleRadians != 0) {
+                finalQuat.set(startQuat);
+                finalQuat.multiplyBy(deltaQuat);
+                finalQuat.normalize();
+                finalQuat.getAxis(rotationAxis);
+                rotationAxisX.set(rotationAxis.getX());
+                rotationAxisY.set(rotationAxis.getY());
+                rotationAxisZ.set(rotationAxis.getZ());
+                rotationAngle.set(Util.normalizeAngle(finalQuat.getAngleDegrees()));
+            }
+        }
+    };
+
 }

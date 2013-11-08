@@ -318,6 +318,7 @@ public final class OrbitalCameraRig implements Attachable {
                         } else {
                             ic = new InteractionDragXZTurntable(xTurntableRotation, zTurntableRotation);
                         }
+                        ic.setNavigationBehavior(nb);
                         // replace rotation in the map
                         interactionMap.put(nb, ic);
                         // attach new rotation to the host

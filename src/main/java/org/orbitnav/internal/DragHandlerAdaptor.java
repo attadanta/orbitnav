@@ -15,7 +15,7 @@ package org.orbitnav.internal;
 import javafx.scene.input.MouseEvent;
 
 /**
- * Minimal adaptor class for a {@link org.orbitnav.internal.DragHandler DragHandler}.
+ * Minimal adaptor class for a {@link DragHandler DragHandler}.
  *
  * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
  */

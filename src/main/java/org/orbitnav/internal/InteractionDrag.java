@@ -12,6 +12,11 @@
  */
 package org.orbitnav.internal;
 
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
+import static javafx.scene.input.MouseEvent.*;
+import org.orbitnav.NavigationBehavior;
+
 /**
  * Abstract base class for all dragging interactions.
  * 
@@ -29,20 +34,54 @@ public abstract class InteractionDrag extends InteractionBase {
     
     @Override public void attachToHost(Host host) {
         super.attachToHost(host);
-        dragHelper.attachToHost(host);
+        host.addEventHandler(MOUSE_PRESSED, mousePressHandler);
+        host.addEventHandler(MOUSE_DRAGGED, mouseDragHandler);
     }
     
     @Override public void detachFromHost(Host host) {
+        host.removeEventHandler(MOUSE_PRESSED, mousePressHandler);
+        host.removeEventHandler(MOUSE_DRAGGED, mouseDragHandler);
         super.detachFromHost(host);
-        dragHelper.detachFromHost(host);
     }
     
     //------------------------------------------------------------------------------------------------------- PROTECTED
-    
+
+    /**
+     * Returns the handler for drag events.
+     *
+     * <p>
+     * This method must be implemented by sub-classes.  This method is called to obtain a
+     * {@link DragHandler DragHandler} that will respond to dragging events produced by the {@link Host Host}.
+     *
+     * @return drag handler
+     */
     protected abstract DragHandler getDragHandler();
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
 
-    private final DragHelper dragHelper = new DragHelper(navigationBehaviorProperty(), getDragHandler());
-    
+    private double x;
+    private double y;
+    private double oldX;
+    private double oldY;
+
+    private final EventHandler<MouseEvent> mousePressHandler = (m) -> {
+        final NavigationBehavior nb = getNavigationBehavior();
+        if (nb.inputEventMatches(m)) {
+            x = m.getSceneX();
+            y = m.getSceneY();
+            getDragHandler().handleClick(m);
+        }
+    };
+
+    private final EventHandler<MouseEvent> mouseDragHandler = (m) -> {
+        final NavigationBehavior nb = getNavigationBehavior();
+        if (nb.inputEventMatches(m)) {
+            oldX = x;
+            oldY = y;
+            x = m.getSceneX();
+            y = m.getSceneY();
+            getDragHandler().handleDrag(m, x - oldX, y - oldY);
+        }
+    };
+
 }

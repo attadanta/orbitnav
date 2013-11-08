@@ -15,8 +15,6 @@ package org.orbitnav.internal;
 import javafx.event.EventHandler;
 import javafx.scene.input.ScrollEvent;
 
-import org.orbitnav.NavigationBehavior;
-
 public abstract class InteractionScroll extends InteractionBase {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
@@ -40,10 +38,5 @@ public abstract class InteractionScroll extends InteractionBase {
     //------------------------------------------------------------------------------------------------------- PROTECTED
     
     protected abstract EventHandler<ScrollEvent> getScrollHandler();
-    
-    protected boolean scrollEventMatches(ScrollEvent se) {
-        final NavigationBehavior nb = getNavigationBehavior();
-        return ((nb == null) || (nb.inputEventMatches(se)));
-    }
     
 }
