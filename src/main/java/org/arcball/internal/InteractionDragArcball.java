@@ -13,14 +13,14 @@
 package org.arcball.internal;
 
 import org.arcball.NavigationBehavior;
+import static org.arcball.NavigationBehavior.Response.ROTATE;
 import org.arcball.internal.geom.MutableVec3D;
 import org.arcball.internal.geom.MutableQuat3D;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.input.MouseButton;
+import static javafx.scene.input.MouseButton.PRIMARY;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -40,15 +40,11 @@ public final class InteractionDragArcball extends InteractionDrag {
         this.rotationAxisY.bindBidirectional(rotationAxisY);
         this.rotationAxisZ.bindBidirectional(rotationAxisZ);
         
-        ChangeListener<Number> whChangeListener = new ChangeListener<Number>() {
-            @Override public void changed(ObservableValue<? extends Number> ob, Number oldNumber, Number newNumber) {
-                updateArcballCenterAndRadius();
-            }
-        };
+        ChangeListener<Number> whChangeListener = (o, old, value) -> updateArcballCenterAndRadius();
         widthProperty().addListener(whChangeListener);
         heightProperty().addListener(whChangeListener);
         
-        setNavigationBehavior(NavigationBehavior.drag(MouseButton.PRIMARY, NavigationBehavior.Response.ROTATE));        
+        setNavigationBehavior(NavigationBehavior.drag(PRIMARY, ROTATE));        
     }
 
     //------------------------------------------------------------------------------------------------------- PROTECTED

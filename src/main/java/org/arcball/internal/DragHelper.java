@@ -13,11 +13,10 @@
 package org.arcball.internal;
 
 import org.arcball.NavigationBehavior;
+import static org.arcball.NavigationBehavior.Input.DRAG;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
@@ -42,13 +41,7 @@ public final class DragHelper implements Attachable {
      */
     public DragHelper(ObjectProperty<NavigationBehavior> navigationBehavior, DragHandler dragHandler) {
         // it only makes sense for DRAG navigation behavior to be assigned; so assert() that
-        this.navigationBehavior.addListener(new ChangeListener<NavigationBehavior>() {
-            @Override public void changed(ObservableValue<? extends NavigationBehavior> ob, 
-                    NavigationBehavior oldnb, NavigationBehavior newnb)
-            {
-                assert(newnb.getInput() == NavigationBehavior.Input.DRAG);
-            }
-        });        
+        this.navigationBehavior.addListener((o, old, value) -> { assert(value.getInput() == DRAG); } );
         
         this.navigationBehavior.bind(navigationBehavior);
         this.dragHandler = dragHandler;        
@@ -105,28 +98,24 @@ public final class DragHelper implements Attachable {
     private double y;
     private InteractionHost host = null;
     
-    private final EventHandler<MouseEvent> mousePressHandler = new EventHandler<MouseEvent>() {
-        @Override public void handle(MouseEvent me) {
-            final NavigationBehavior nb = navigationBehavior.get();
-            if ((nb == null) || (nb.mouseEventMatches(me))) {
-                x = me.getSceneX();
-                y = me.getSceneY();
-                dragHandler.handleClick(me);
-            }
-        }
+    private final EventHandler<MouseEvent> mousePressHandler = (m) -> {
+    	final NavigationBehavior nb = navigationBehavior.get();
+    	if ((nb == null) || (nb.mouseEventMatches(m))) {
+    		x = m.getSceneX();
+    		y = m.getSceneY();
+    		dragHandler.handleClick(m);
+    	}
     };
-    
-    private final EventHandler<MouseEvent> mouseDragHandler = new EventHandler<MouseEvent>() {
-        @Override public void handle(MouseEvent me) {
-            final NavigationBehavior nb = navigationBehavior.get();
-            if ((nb == null) || (nb.mouseEventMatches(me))) {
-                final double oldX = x;
-                final double oldY = y;
-                x = me.getSceneX();
-                y = me.getSceneY();
-                dragHandler.handleDrag(me, x - oldX, y - oldY);
-            }
-        }
+
+    private final EventHandler<MouseEvent> mouseDragHandler = (m) -> {
+    	final NavigationBehavior nb = navigationBehavior.get();
+    	if ((nb == null) || (nb.mouseEventMatches(m))) {
+    		final double oldX = x;
+    		final double oldY = y;
+    		x = m.getSceneX();
+    		y = m.getSceneY();
+    		dragHandler.handleDrag(m, x - oldX, y - oldY);
+    	}
     };
     
 }

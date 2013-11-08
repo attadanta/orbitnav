@@ -12,10 +12,7 @@
  */
 package org.arcball.internal;
 
-import org.arcball.NavigationBehavior;
-
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import static org.arcball.NavigationBehavior.Input.DRAG;
 
 /**
  * Abstract base class for all dragging interactions.
@@ -29,13 +26,7 @@ public abstract class InteractionDrag extends InteractionBase {
     public InteractionDrag() {
         super();
         // it only makes sense for DRAG navigation behavior to be assigned; so assert() that
-        navigationBehaviorProperty().addListener(new ChangeListener<NavigationBehavior>() {
-            @Override public void changed(ObservableValue<? extends NavigationBehavior> ob, 
-                    NavigationBehavior oldnb, NavigationBehavior newnb)
-            {
-                assert(newnb.getInput() == NavigationBehavior.Input.DRAG);
-            }
-        });        
+        navigationBehaviorProperty().addListener((o, old, value) -> { assert(value.getInput() == DRAG); });
     }
     
     @Override public void attachToHost(InteractionHost host) {

@@ -13,10 +13,11 @@
 package org.arcball.internal;
 
 import org.arcball.NavigationBehavior;
+import static org.arcball.NavigationBehavior.Response.ZOOM;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.input.MouseButton;
+import static javafx.scene.input.MouseButton.MIDDLE;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -30,7 +31,7 @@ public class InteractionDragZoom extends InteractionDrag {
     
     public InteractionDragZoom(DoubleProperty distanceFromOrigin) {
         this.distanceFromOrigin.bindBidirectional(distanceFromOrigin);
-        setNavigationBehavior(NavigationBehavior.drag(MouseButton.MIDDLE, NavigationBehavior.Response.ZOOM));
+        setNavigationBehavior(NavigationBehavior.drag(MIDDLE, ZOOM));
     }
     
     public DoubleProperty distanceFromOriginProperty() { return distanceFromOrigin; }

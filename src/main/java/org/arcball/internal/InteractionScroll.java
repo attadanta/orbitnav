@@ -12,12 +12,11 @@
  */
 package org.arcball.internal;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.input.ScrollEvent;
 
 import org.arcball.NavigationBehavior;
+import static org.arcball.NavigationBehavior.Input.SCROLL;
 
 public abstract class InteractionScroll extends InteractionBase {
 
@@ -26,13 +25,7 @@ public abstract class InteractionScroll extends InteractionBase {
     public InteractionScroll() {
         super();
         // it only makes sense for SCROLL navigation behavior to be assigned; so assert() that
-        navigationBehaviorProperty().addListener(new ChangeListener<NavigationBehavior>() {
-            @Override public void changed(ObservableValue<? extends NavigationBehavior> ob, 
-                    NavigationBehavior oldnb, NavigationBehavior newnb)
-            {
-                assert(newnb.getInput() == NavigationBehavior.Input.SCROLL);
-            }
-        });                
+        navigationBehaviorProperty().addListener((ob, old, value) -> { assert(value.getInput() == SCROLL); });
     }
     
     @Override public void attachToHost(InteractionHost host) {
@@ -50,7 +43,7 @@ public abstract class InteractionScroll extends InteractionBase {
     protected abstract EventHandler<ScrollEvent> getScrollHandler();
     
     protected boolean scrollEventMatches(ScrollEvent se) {
-        NavigationBehavior nb = getNavigationBehavior();
+        final NavigationBehavior nb = getNavigationBehavior();
         return ((nb == null) || (nb.scrollEventMatches(se)));
     }
     

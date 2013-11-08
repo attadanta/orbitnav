@@ -13,10 +13,11 @@
 package org.arcball.internal;
 
 import org.arcball.NavigationBehavior;
+import static org.arcball.NavigationBehavior.Response.ROTATE;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.input.MouseButton;
+import static javafx.scene.input.MouseButton.PRIMARY;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -32,7 +33,7 @@ public final class InteractionDragXZTurntable extends InteractionDrag {
         this.xRotation.bindBidirectional(xRotation);
         this.zRotation.bindBidirectional(zRotation);
         
-        setNavigationBehavior(NavigationBehavior.drag(MouseButton.PRIMARY, NavigationBehavior.Response.ROTATE));        
+        setNavigationBehavior(NavigationBehavior.drag(PRIMARY, ROTATE));        
     }
 
     public DoubleProperty xRotationProperty() { return xRotation; }
