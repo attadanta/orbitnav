@@ -1,4 +1,4 @@
-name := "javafx8-arcball"
+name := "orbitnav"
 
 version := "1.0"
 
