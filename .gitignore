@@ -5,3 +5,7 @@ target
 .cache
 doc
 org.eclipse.jdt.core.prefs
+.name
+.idea
+orbitnav.iml
+out

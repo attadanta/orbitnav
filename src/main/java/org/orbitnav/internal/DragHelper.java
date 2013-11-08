@@ -19,6 +19,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
+import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
+import static javafx.scene.input.MouseEvent.MOUSE_DRAGGED;
 
 /**
  * Drag helper class.  Keeps track of mouse press and drag events for a <code>Scene</code> or <code>SubScene</code>.
@@ -55,8 +57,8 @@ public final class DragHelper implements Attachable {
     public void attachToHost(InteractionHost host) {
         assert(this.host == null);
         this.host = host;
-        host.addEventHandler(MouseEvent.MOUSE_PRESSED, mousePressHandler);
-        host.addEventHandler(MouseEvent.MOUSE_DRAGGED, mouseDragHandler);
+        host.addEventHandler(MOUSE_PRESSED, mousePressHandler);
+        host.addEventHandler(MOUSE_DRAGGED, mouseDragHandler);
     }
 
     /**
@@ -66,8 +68,8 @@ public final class DragHelper implements Attachable {
      */
     public void detachFromHost(InteractionHost host) {
         assert(this.host == host);
-        host.removeEventHandler(MouseEvent.MOUSE_PRESSED, mousePressHandler);
-        host.removeEventHandler(MouseEvent.MOUSE_DRAGGED, mouseDragHandler);
+        host.removeEventHandler(MOUSE_PRESSED, mousePressHandler);
+        host.removeEventHandler(MOUSE_DRAGGED, mouseDragHandler);
         this.host = null;
     }
     
@@ -91,9 +93,9 @@ public final class DragHelper implements Attachable {
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
-    private ObjectProperty<NavigationBehavior> navigationBehavior = 
-            new SimpleObjectProperty<NavigationBehavior>(this, "navigationBehavior", null);
-    private final DragHandler dragHandler;
+    private ObjectProperty<NavigationBehavior> navigationBehavior =
+            new SimpleObjectProperty<>(this, "navigationBehavior", null);
+    private DragHandler dragHandler; // TODO: ideally, DragHandler should be final, but problems arise with lambdas
     private double x;
     private double y;
     private InteractionHost host = null;
