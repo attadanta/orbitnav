@@ -3,7 +3,6 @@ package org.orbitnav.example;
 import java.io.File;
 import java.util.List;
 
-import org.orbitnav.ArcballCameraRig;
 import org.orbitnav.CameraRig;
 import org.orbitnav.CameraToRasterTransform;
 import org.orbitnav.Pane3D;
