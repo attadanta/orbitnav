@@ -14,7 +14,32 @@ package org.orbitnav;
 
 import javafx.geometry.Point2D;
 
+/**
+ * Performs a coordinate transformation from a 3D scene to the 2D coordinates of the raster on which the scene is
+ * displayed.
+ */
 public interface CameraToRasterTransform {
+
+    /**
+     * Transforms a 3D coordinate from the scene into 2D coordinates.
+     *
+     * @param x x coordinate in the 3D scene
+     * @param y y coordinate in the 3D scene
+     * @param z z coordinate in the 3D scene
+     * @return 2D raster coordinate
+     */
     Point2D transform(double x, double y, double z);
+
+    /**
+     * Transforms the radius of a sphere centered at coordinates (<code>x</code>, <code>y</code>, <code>z</code>) in
+     * the 3D scene to the equivalent radius of a circle on the raster.
+     *
+     * @param x x coordinate of the center of the sphere in the 3D scene
+     * @param y y coordinate of the center of the sphere in the 3D scene
+     * @param z z coordinate of the center of the sphere in the 3D scene
+     * @param radius radius of the sphere in the 3D scene
+     * @return radius of the sphere on the 2D raster
+     */
     double transformRadius(double x, double y, double z, double radius);
+
 }
