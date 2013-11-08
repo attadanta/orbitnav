@@ -53,6 +53,10 @@ public abstract class InteractionDrag extends InteractionBase {
      * This method must be implemented by sub-classes.  This method is called to obtain a
      * {@link DragHandler DragHandler} that will respond to dragging events produced by the {@link Host Host}.
      *
+     * <p>
+     * This method will be called multiple times by <code>InteractionDrag</code> (once per event handler invocation),
+     * so the implementation should ideally just return a final field.
+     *
      * @return drag handler
      */
     protected abstract DragHandler getDragHandler();
