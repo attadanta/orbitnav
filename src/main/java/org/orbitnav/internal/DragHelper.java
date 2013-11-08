@@ -18,8 +18,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
-import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
-import static javafx.scene.input.MouseEvent.MOUSE_DRAGGED;
+import static javafx.scene.input.MouseEvent.*;
 
 /**
  * Drag helper class.  Keeps track of mouse press and drag events for a <code>Scene</code> or <code>SubScene</code>.
@@ -54,8 +53,6 @@ public final class DragHelper implements Attachable {
      * @param host host to which attachment should be made
      */
     public void attachToHost(Host host) {
-        assert(this.host == null);
-        this.host = host;
         host.addEventHandler(MOUSE_PRESSED, mousePressHandler);
         host.addEventHandler(MOUSE_DRAGGED, mouseDragHandler);
     }
@@ -66,30 +63,10 @@ public final class DragHelper implements Attachable {
      * @param host host from which to detach
      */
     public void detachFromHost(Host host) {
-        assert(this.host == host);
         host.removeEventHandler(MOUSE_PRESSED, mousePressHandler);
         host.removeEventHandler(MOUSE_DRAGGED, mouseDragHandler);
-        this.host = null;
     }
-    
-    /**
-     * Sets the navigation behavior.
-     * @param nb navigation behavior
-     */
-    public void setNavigationBehavior(NavigationBehavior nb) { navigationBehavior.set(nb); }
 
-    /**
-     * Gets the navigation behavior.
-     * @return navigation behavior
-     */
-    public NavigationBehavior getNavigationBehavior() { return navigationBehavior.get(); }
-    
-    /**
-     * Returns the navigation behavior property.
-     * @return navigation behavior property
-     */
-    public ObjectProperty<NavigationBehavior> navigationBehaviorProperty() { return navigationBehavior; }
-    
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
     private ObjectProperty<NavigationBehavior> navigationBehavior =
@@ -97,7 +74,8 @@ public final class DragHelper implements Attachable {
     private DragHandler dragHandler; // TODO: dragHandler should be final, but problems arise with lambdas
     private double x;
     private double y;
-    private Host host = null;
+    private double oldX;
+    private double oldY;
     
     private final EventHandler<MouseEvent> mousePressHandler = (m) -> {
     	final NavigationBehavior nb = navigationBehavior.get();
@@ -111,8 +89,8 @@ public final class DragHelper implements Attachable {
     private final EventHandler<MouseEvent> mouseDragHandler = (m) -> {
     	final NavigationBehavior nb = navigationBehavior.get();
     	if ((nb == null) || (nb.inputEventMatches(m))) {
-    		final double oldX = x;
-    		final double oldY = y;
+    		oldX = x;
+    		oldY = y;
     		x = m.getSceneX();
     		y = m.getSceneY();
     		dragHandler.handleDrag(m, x - oldX, y - oldY);
