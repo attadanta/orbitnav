@@ -15,7 +15,16 @@ package org.orbitnav;
 import javafx.scene.input.*;
 
 /**
- * Specifies a desired kind of navigation behaviour.
+ * Specifies a desired kind of navigation behavior for an {@link OrbitalCameraRig OrbitalCameraRig}.
+ *
+ * <p>
+ * The navigation behavior is specified by a combination of a navigation input, optional {@link Modifier Modifier}
+ * keys, and an {@link Activity Activity} (or response) that is associated with the behavior.  The navigation behaviors
+ * can be added to an {@link OrbitalCameraRig OrbitalCameraRig} using the
+ * {@link OrbitalCameraRig#addNavigationBehavior(NavigationBehavior) addNavigationBehavior} method, and removed using
+ * the {@link OrbitalCameraRig#removeNavigationBehavior(NavigationBehavior) removeNavigationBehavior} method.  The
+ * {@link OrbitalCameraRig OrbitalCameraRig} will adapt its behavior to include the specified new behavior as
+ * required.
  *
  * <p>
  * Navigation inputs can be any of the following:
@@ -25,10 +34,11 @@ import javafx.scene.input.*;
  *     <li>zoom gestures</li>
  *     <li>rotate gestures</li>
  * </ul>
- * Each of these inputs can be associated with some combination of {@link Modifier} keys (shift, alt and control).
- * The input is also associated with a required {@link Activity} or response (pan, zoom or rotate).  The combination of
- * input and activity specify the behavior.
- * </p>
+ *
+ * <p>
+ * Each of these inputs can be associated with some combination of {@link Modifier Modifier} keys (shift, alt and
+ * control).  The input is also associated with a required {@link Activity Activity} or response (pan, zoom or rotate).
+ * The combination of input and activity specify the behavior.
  *
  * <p>
  * <code>NavigationBehavior</code>s should be constructed using the
@@ -36,12 +46,10 @@ import javafx.scene.input.*;
  * {@link #gestureScroll(Activity, Modifier...) gestureScroll},
  * {@link #gestureZoom(Modifier...) gestureZoom} or
  * {@link #gestureRotate(Modifier...) gestureRotate} static methods.
- * </p>
  *
  * <p>
- * There are some limitations on the kinds of {@link Activity} that can associated with different inputs.  The
+ * There are some limitations on the kinds of {@link Activity Activity} that can associated with different inputs.  The
  * zoom and rotate gestures can only be associated with zoom and rotate activities respectively.
- * </p>
  *
  * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
  */
@@ -98,7 +106,6 @@ public abstract class NavigationBehavior {
      * <p>
      * Input conditions comprise the type of navigation input (eg. drag or gesture) and the modifier keys, but
      * <b>not</b> the type of activity (eg. pan, zoom or rotation).
-     * </p>
      *
      * @param b the behavior to check against this behavior
      * @return <code>true</code> if the input conditions match and <code>false</code> if they don't match
@@ -114,7 +121,6 @@ public abstract class NavigationBehavior {
      * The <code>InputEvent</code> matches if its class is appropriate to the type of navigation input (eg. a
      * <code>MouseEvent</code> is required for a drag gesture), and if the combination of modifier keys matches the
      * set of specified modifiers.
-     * </p>
      *
      * @param e event to check
      * @return <code>true</code> if the <code>InputEvent</code> matches the criteria required by this behavior
@@ -190,7 +196,6 @@ public abstract class NavigationBehavior {
      * {@link #gestureScroll(Activity, Modifier...) gestureScroll},
      * {@link #gestureZoom(Modifier...) gestureZoom} or
      * {@link #gestureRotate(Modifier...) gestureRotate} static methods.
-     * </p>
      *
      * @param activity the kind of activity (i.e. the response to the input) required by this behavior
      * @param modifiers the modifiers required by this behavior
@@ -256,7 +261,7 @@ public abstract class NavigationBehavior {
     }
 
     /** Private implementation class for the scroll gesture navigation behavior. */
-    public static final class Scroll extends NavigationBehavior {
+    private static final class Scroll extends NavigationBehavior {
         @Override public boolean inputConditionsMatch(NavigationBehavior b) {
             return super.inputConditionsMatch(b) && b.isGestureScroll();
         }
@@ -275,7 +280,7 @@ public abstract class NavigationBehavior {
     }
 
     /** Private implementation class for the zoom gesture navigation behavior. */
-    public static final class Zoom extends NavigationBehavior {
+    private static final class Zoom extends NavigationBehavior {
         @Override public boolean inputConditionsMatch(NavigationBehavior b) {
             return super.inputConditionsMatch(b) && b.isGestureZoom();
         }
@@ -294,7 +299,7 @@ public abstract class NavigationBehavior {
     }
 
     /** Private implementation class for the rotation gesture navigation behavior. */
-    public static final class Rotate extends NavigationBehavior {
+    private static final class Rotate extends NavigationBehavior {
         @Override public boolean inputConditionsMatch(NavigationBehavior b) {
             return super.inputConditionsMatch(b) && b.isGestureRotate();
         }

@@ -40,7 +40,7 @@ public final class Util {
     }
     
     /**
-     * Normalizes an angle (in degrees) to the range 0 <= angle < 360.0.
+     * Normalizes an angle (in degrees) to the range 0 &lt;= angle &lt; 360.0.
      * @param angle angle (degrees) to normalize
      * @return normalized angle (degrees)
      */

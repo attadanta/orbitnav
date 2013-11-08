@@ -31,7 +31,7 @@ public final class MutableTurntable3D {
     /**
      * Sets this turntable rotation (angles expressed in radians).
      * @param xRotation x rotation angle (radians)
-     * @param yRotation z rotation angle (radians)
+     * @param zRotation z rotation angle (radians)
      */
     public void setRadians(double xRotation, double zRotation) {
         xRot = Util.normalizeAngle(xRotation);
@@ -41,7 +41,7 @@ public final class MutableTurntable3D {
     /**
      * Sets this turntable rotation (angles expressed in degrees).
      * @param xRotation x rotation angle (degrees)
-     * @param yRotation z rotation angle (degrees)
+     * @param zRotation z rotation angle (degrees)
      */
     public void setDegrees(double xRotation, double zRotation) {
         setRadians(Math.toRadians(xRotation), Math.toRadians(zRotation));

@@ -50,7 +50,6 @@ public final class MutableVec3D {
     /**
      * Returns the z component of the vector.
      * @return z component
-     * @return
      */
     public double getZ() { return z; }
     
