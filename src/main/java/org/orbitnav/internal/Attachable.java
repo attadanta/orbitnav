@@ -12,6 +12,17 @@
  */
 package org.orbitnav.internal;
 
+/**
+ * Attachable objects can be attached and detached from a {@link Host Host}.
+ *
+ * <p>
+ * Hosts are normally JavaFX <code>Scene</code> or <code>SubScene</code> objects.  They provide event dispatching for
+ * the kinds of events that {@link Interaction Interactions} can respond to, as well as width and height information.
+ * Classes that implement <code>Attachable</code> can then be attached-to or detached-from {@link Host Hosts} to enable
+ * or disable their functionality.
+ *
+ * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
+ */
 public interface Attachable {
     
     /**
@@ -19,7 +30,7 @@ public interface Attachable {
      *  
      * @param host host to which attachment should be made
      */
-    void attachToHost(InteractionHost host);
+    void attachToHost(Host host);
     
     /**
      * Detaches from a host.
@@ -28,6 +39,6 @@ public interface Attachable {
      * 
      * @param host host from which to detach
      */
-    void detachFromHost(InteractionHost host);
+    void detachFromHost(Host host);
     
 }

@@ -20,15 +20,15 @@ import javafx.scene.Camera;
 import javafx.scene.SubScene;
 
 /**
- * Adaptor class to convert a <code>SubScene</code> to an {@link org.orbitnav.internal.InteractionHost InteractionHost}.
+ * Adaptor class to convert a <code>SubScene</code> to an {@link Host Host}.
  * 
  * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
  */
-public class InteractionHostSubScene implements InteractionHost {
+public class HostSubScene implements Host {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
     
-    public InteractionHostSubScene(SubScene subscene) {
+    public HostSubScene(SubScene subscene) {
         this.subscene = subscene;
     }
     

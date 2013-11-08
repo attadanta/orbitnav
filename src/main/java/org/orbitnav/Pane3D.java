@@ -13,7 +13,8 @@
 package org.orbitnav;
 
 import org.orbitnav.internal.AxisTriad;
-import org.orbitnav.internal.InteractionHostSubScene;
+import org.orbitnav.internal.HostSubScene;
+
 import static org.orbitnav.NavigationBehavior.Activity.*;
 
 import javafx.beans.property.ObjectProperty;
@@ -25,7 +26,7 @@ import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
-import javafx.scene.input.MouseButton;
+
 import static javafx.scene.input.MouseButton.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -86,7 +87,7 @@ public final class Pane3D extends Pane {
         //setCameraRig(new ArcballCameraRig());
         
         cameraRig.setArcballEnabled(true);
-        cameraRig.attachToHost(new InteractionHostSubScene(subScene));
+        cameraRig.attachToHost(new HostSubScene(subScene));
         cameraRig.addNavigationBehavior(NavigationBehavior.mouseDrag(PRIMARY, ROTATE));
         cameraRig.addNavigationBehavior(NavigationBehavior.mouseDrag(SECONDARY, PAN));
         cameraRig.addNavigationBehavior(NavigationBehavior.mouseDrag(MIDDLE, ZOOM));

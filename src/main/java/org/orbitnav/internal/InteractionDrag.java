@@ -23,16 +23,16 @@ public abstract class InteractionDrag extends InteractionBase {
     
     public InteractionDrag() {
         super();
-        // it only makes sense for DRAG navigation behavior to be assigned; so assert() that
+        // it only makes sense for mouseDrag navigation behavior to be assigned; so assert() that
         navigationBehaviorProperty().addListener((o, old, value) -> { assert(value.isMouseDrag()); });
     }
     
-    @Override public void attachToHost(InteractionHost host) {
+    @Override public void attachToHost(Host host) {
         super.attachToHost(host);
         dragHelper.attachToHost(host);
     }
     
-    @Override public void detachFromHost(InteractionHost host) {
+    @Override public void detachFromHost(Host host) {
         super.detachFromHost(host);
         dragHelper.detachFromHost(host);
     }

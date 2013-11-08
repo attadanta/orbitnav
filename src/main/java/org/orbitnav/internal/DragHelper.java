@@ -53,7 +53,7 @@ public final class DragHelper implements Attachable {
      * 
      * @param host host to which attachment should be made
      */
-    public void attachToHost(InteractionHost host) {
+    public void attachToHost(Host host) {
         assert(this.host == null);
         this.host = host;
         host.addEventHandler(MOUSE_PRESSED, mousePressHandler);
@@ -65,7 +65,7 @@ public final class DragHelper implements Attachable {
      * 
      * @param host host from which to detach
      */
-    public void detachFromHost(InteractionHost host) {
+    public void detachFromHost(Host host) {
         assert(this.host == host);
         host.removeEventHandler(MOUSE_PRESSED, mousePressHandler);
         host.removeEventHandler(MOUSE_DRAGGED, mouseDragHandler);
@@ -97,7 +97,7 @@ public final class DragHelper implements Attachable {
     private DragHandler dragHandler; // TODO: dragHandler should be final, but problems arise with lambdas
     private double x;
     private double y;
-    private InteractionHost host = null;
+    private Host host = null;
     
     private final EventHandler<MouseEvent> mousePressHandler = (m) -> {
     	final NavigationBehavior nb = navigationBehavior.get();

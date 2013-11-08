@@ -27,12 +27,12 @@ public abstract class InteractionScroll extends InteractionBase {
         navigationBehaviorProperty().addListener((ob, old, value) -> { assert(value.isGestureScroll()); });
     }
     
-    @Override public void attachToHost(InteractionHost host) {
+    @Override public void attachToHost(Host host) {
         super.attachToHost(host);
         host.addEventHandler(ScrollEvent.SCROLL, getScrollHandler());
     }
     
-    @Override public void detachFromHost(InteractionHost host) {
+    @Override public void detachFromHost(Host host) {
         super.detachFromHost(host);
         host.removeEventHandler(ScrollEvent.SCROLL, getScrollHandler());
     }

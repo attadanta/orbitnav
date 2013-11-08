@@ -20,35 +20,63 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import org.orbitnav.NavigationBehavior;
 
-public abstract class InteractionBase implements Attachable {
+/**
+ * Base class for {@link Interaction Interactions}, providing concrete implementations of the interaction methods.
+ *
+ * @author Jonathan Merritt (<a href="mailto:j.s.merritt@gmail.com">j.s.merritt@gmail.com</a>)
+ */
+public abstract class InteractionBase implements Interaction {
 
     //---------------------------------------------------------------------------------------------------------- PUBLIC
 
-    public void attachToHost(InteractionHost host) {
+    @Override public void attachToHost(Host host) {
+        assert(this.host == null);
+        this.host = host;
         width.bind(host.widthProperty());
         height.bind(host.heightProperty());
     }
     
-    public void detachFromHost(InteractionHost host) {
+    @Override public void detachFromHost(Host host) {
+        assert(this.host == host);
+        this.host = null;
         width.unbind();
         height.unbind();
     }
-        
-    public ObjectProperty<NavigationBehavior> navigationBehaviorProperty() { return navigationBehavior; }
-    public NavigationBehavior getNavigationBehavior() { return navigationBehavior.get(); }
-    public void setNavigationBehavior(NavigationBehavior nb) { navigationBehavior.set(nb); }
-    
+
+    @Override public ObjectProperty<NavigationBehavior> navigationBehaviorProperty() { return navigationBehavior; }
+    @Override public NavigationBehavior getNavigationBehavior() { return navigationBehavior.get(); }
+    @Override public void setNavigationBehavior(NavigationBehavior nb) { navigationBehavior.set(nb); }
+
+    /**
+     * Property bound to the width of the interaction's current host.
+     * @return property bound to the width of the interaction's current host
+     */
     public ReadOnlyDoubleProperty widthProperty() { return width; }
+
+    /**
+     * Returns the width of the interaction's current host.
+     * @return the width of the current host
+     */
     public double getWidth() { return width.get(); }
-    
+
+    /**
+     * Property bound to the height of the interaction's current host.
+     * @return property bound to the height of the interaction's current host
+     */
     public ReadOnlyDoubleProperty heightProperty() { return height; }
-    public double getHeight() { return height.get(); }    
+
+    /**
+     * Returns the height of the interaction's current host.
+     * @return height of the current host
+     */
+    public double getHeight() { return height.get(); }
     
     //--------------------------------------------------------------------------------------------------------- PRIVATE
     
     private final ObjectProperty<NavigationBehavior> navigationBehavior =
             new SimpleObjectProperty<>(this, "navigationBehavior", null);
+    private Host host;
     private final DoubleProperty width = new SimpleDoubleProperty(this, "width", 1.0);
-    private final DoubleProperty height = new SimpleDoubleProperty(this, "height", 1.0);    
+    private final DoubleProperty height = new SimpleDoubleProperty(this, "height", 1.0);
     
 }

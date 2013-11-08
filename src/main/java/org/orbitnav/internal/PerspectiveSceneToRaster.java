@@ -43,7 +43,7 @@ public final class PerspectiveSceneToRaster implements CameraToRasterTransform {
         this.flcoeff = focalLength * this.w2;
     }
     
-    public void setParameters(PerspectiveCamera camera, Transform transformRotationTranslation, InteractionHost host) {
+    public void setParameters(PerspectiveCamera camera, Transform transformRotationTranslation, Host host) {
         setParameters(camera, transformRotationTranslation, host.getWidth(), host.getHeight());
     }
         

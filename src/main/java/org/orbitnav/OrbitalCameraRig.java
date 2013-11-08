@@ -17,16 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.orbitnav.internal.Attachable;
-import org.orbitnav.internal.InteractionBase;
-import org.orbitnav.internal.InteractionDragArcball;
-import org.orbitnav.internal.InteractionDragPan;
-import org.orbitnav.internal.InteractionDragXZTurntable;
-import org.orbitnav.internal.InteractionDragZoom;
-import org.orbitnav.internal.InteractionHost;
-import org.orbitnav.internal.InteractionScrollZoom;
-import org.orbitnav.internal.NoGarbageProperty;
-import org.orbitnav.internal.PerspectiveSceneToRaster;
+import org.orbitnav.internal.*;
+import org.orbitnav.internal.Host;
 import org.orbitnav.internal.geom.MutableAxisAngle3D;
 import org.orbitnav.internal.geom.MutableTurntable3D;
 import org.orbitnav.internal.geom.MutableVec3D;
@@ -62,29 +54,29 @@ public final class OrbitalCameraRig implements Attachable {
         // TODO:
     }
 
-    public void attachToHost(InteractionHost host) {
+    public void attachToHost(Host host) {
         assert(this.host == null);
         this.host = host;
         this.host.setCamera(camera.get());
-        for (InteractionBase ib : interactionMap.values()) {
-            attachInteractionToHost(ib);
+        for (Interaction ic : interactionMap.values()) {
+            attachInteractionToHost(ic);
         }
     }
     
-    public void detachFromHost(InteractionHost host) {
+    public void detachFromHost(Host host) {
         assert(this.host == host);
         this.host.setCamera(null);
-        for (InteractionBase ib : interactionMap.values()) {
-            detachInteractionFromHost(ib);
+        for (Interaction ic : interactionMap.values()) {
+            detachInteractionFromHost(ic);
         }
         this.host = null;
     }
         
     public void addNavigationBehavior(NavigationBehavior nb) { 
         removeNavigationBehavior(nb);    // removes any previous match for these input conditions
-        InteractionBase ib = createInteraction(nb);
-        attachInteractionToHost(ib);
-        interactionMap.put(nb, ib);
+        Interaction ic = createInteraction(nb);
+        attachInteractionToHost(ic);
+        interactionMap.put(nb, ic);
         navigationBehaviorsList.add(nb);
     }
     
@@ -100,8 +92,8 @@ public final class OrbitalCameraRig implements Attachable {
     }
     
     public void clearNavigationBehaviors() {
-        for (InteractionBase ib : interactionMap.values()) {
-            detachInteractionFromHost(ib);
+        for (Interaction ic : interactionMap.values()) {
+            detachInteractionFromHost(ic);
         }
         interactionMap.clear();
         navigationBehaviorsList.clear();
@@ -185,10 +177,9 @@ public final class OrbitalCameraRig implements Attachable {
             new NoGarbageProperty<CameraToRasterTransform>(this, "transformToRaster",
                     new PerspectiveSceneToRaster());
         
-    private final Map<NavigationBehavior, InteractionBase> interactionMap = 
-            new HashMap<NavigationBehavior, InteractionBase>(); 
+    private final Map<NavigationBehavior, Interaction> interactionMap = new HashMap<>();
     
-    private InteractionHost host = null;
+    private Host host = null;
     
     private final MutableTurntable3D turntableRotation = new MutableTurntable3D();
     private final MutableAxisAngle3D axisAngleRotation = new MutableAxisAngle3D();
@@ -237,24 +228,24 @@ public final class OrbitalCameraRig implements Attachable {
         camera.get().getTransforms().setAll(transformCamera.get());
     }
     
-    private InteractionBase createInteraction(NavigationBehavior nb) {
-        InteractionBase ib = null;
+    private Interaction createInteraction(NavigationBehavior nb) {
+        Interaction ic = null;
 
         if (nb.isMouseDrag()) {
             switch (nb.getActivity()) {
                 case PAN:
-                    ib = new InteractionDragPan(
+                    ic = new InteractionDragPan(
                             originX, originY, originZ, transformRotationOnly, distanceFromOrigin, camera
                     );
                     break;
                 case ZOOM:
-                    ib = new InteractionDragZoom(distanceFromOrigin);
+                    ic = new InteractionDragZoom(distanceFromOrigin);
                     break;
                 case ROTATE:
                     if (isArcballEnabled()) {
-                        ib = new InteractionDragArcball(rotationAngle, rotationAxisX, rotationAxisY, rotationAxisZ);
+                        ic = new InteractionDragArcball(rotationAngle, rotationAxisX, rotationAxisY, rotationAxisZ);
                     } else {
-                        ib = new InteractionDragXZTurntable(xTurntableRotation, zTurntableRotation);
+                        ic = new InteractionDragXZTurntable(xTurntableRotation, zTurntableRotation);
                     }
                     break;
             }
@@ -265,7 +256,7 @@ public final class OrbitalCameraRig implements Attachable {
                 case PAN:   // TODO
                     break;
                 case ZOOM:
-                    ib = new InteractionScrollZoom(distanceFromOrigin);
+                    ic = new InteractionScrollZoom(distanceFromOrigin);
                     break;
                 case ROTATE:    // TODO
                     break;
@@ -274,21 +265,21 @@ public final class OrbitalCameraRig implements Attachable {
             // TODO:
         }
 
-        if (ib != null) {
-            ib.setNavigationBehavior(nb);
+        if (ic != null) {
+            ic.setNavigationBehavior(nb);  // associates modifiers, mouse buttons, etc.
         }
-        return ib;
+        return ic;
     }
     
-    private void attachInteractionToHost(InteractionBase ib) {
+    private void attachInteractionToHost(Interaction ic) {
         if (host != null) {
-            ib.attachToHost(host);
+            ic.attachToHost(host);
         }
     }
     
-    private void detachInteractionFromHost(InteractionBase ib) {
+    private void detachInteractionFromHost(Interaction ic) {
         if (host != null) {
-            ib.detachFromHost(host);
+            ic.detachFromHost(host);
         }
     }
     
@@ -320,17 +311,17 @@ public final class OrbitalCameraRig implements Attachable {
                         // detach existing rotation from the host
                         detachInteractionFromHost(interactionMap.get(nb));
                         // create new rotation
-                        InteractionBase ib;
+                        Interaction ic;
                         if (newe == true) {
-                            ib = new InteractionDragArcball(rotationAngle, 
+                            ic = new InteractionDragArcball(rotationAngle,
                                     rotationAxisX, rotationAxisY, rotationAxisZ);
                         } else {
-                            ib = new InteractionDragXZTurntable(xTurntableRotation, zTurntableRotation);
+                            ic = new InteractionDragXZTurntable(xTurntableRotation, zTurntableRotation);
                         }
                         // replace rotation in the map
-                        interactionMap.put(nb, ib);
+                        interactionMap.put(nb, ic);
                         // attach new rotation to the host
-                        attachInteractionToHost(ib);
+                        attachInteractionToHost(ic);
                     }
                 }
             }
