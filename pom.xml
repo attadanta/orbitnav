@@ -35,9 +35,11 @@
     </build>
 
     <repositories>
+
         <repository>
-            <id>BioJava Maven Repository</id>
-            <url>http://biojava.org/download/maven</url>
+            <id>biojava-legacy-repo</id>
+            <name>BioJava's Git based legacy maven repo</name>
+            <url>https://github.com/biojava/maven-repo/raw/master/</url>
         </repository>
     </repositories>
 
